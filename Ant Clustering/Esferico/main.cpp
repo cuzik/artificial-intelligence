@@ -71,10 +71,10 @@ int main(int argc, char const *argv[]){
         }
     }
     position_dead_ants(matrix, 1);
-    position_dead_ants(matrix, 2);
-    position_dead_ants(matrix, 3);
-    position_dead_ants(matrix, 4);
-    position_dead_ants(matrix, 5);
+    // position_dead_ants(matrix, 2);
+    // position_dead_ants(matrix, 3);
+    // position_dead_ants(matrix, 4);
+    // position_dead_ants(matrix, 5);
     // position_dead_ants(matrix, 6);
     // position_dead_ants(matrix, 7);
     // position_dead_ants(matrix, 8);
@@ -175,8 +175,8 @@ void matrix_draw(int **matrix){
         for(j=0;j<y_Dimension;j++){
             switch(matrix[i][j]){
                 case 1:
-                    // al_draw_filled_rectangle(TAM_BORDA+(i*TAM_CELULA), TAM_BORDA+(j*TAM_CELULA),TAM_BORDA+((i+1)*TAM_CELULA), TAM_BORDA+((j+1)*TAM_CELULA), al_map_rgb(255, 255, 0));
-                    al_draw_filled_circle(TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(255, 255, 0));
+                    al_draw_filled_rectangle(TAM_BORDA+(i*TAM_CELULA), TAM_BORDA+(j*TAM_CELULA),TAM_BORDA+((i+1)*TAM_CELULA), TAM_BORDA+((j+1)*TAM_CELULA), al_map_rgb(255, 255, 0));
+                    // al_draw_filled_circle(TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(255, 255, 0));
                     break;
                 case 2:
                     // al_draw_filled_rectangle(TAM_BORDA+(i*TAM_CELULA), TAM_BORDA+(j*TAM_CELULA),TAM_BORDA+((i+1)*TAM_CELULA), TAM_BORDA+((j+1)*TAM_CELULA), al_map_rgb(255, 0, 255));

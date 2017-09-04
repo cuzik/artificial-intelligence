@@ -5,9 +5,18 @@
 #include <pthread.h>
 #include <math.h>
 
-double alpha = 42;
-double k1 = 0.1;
-double k2 = 0.2;
+
+// double alpha = 35;
+// double k1 = 0.1;
+// double k2 = 0.3;
+
+double alpha = 1.6;
+double k1 = 0.4;
+double k2 = 0.8;
+
+// double alpha = 11;
+// double k1 = 0.2;
+// double k2 = 0.4;
 
 using namespace std;
 
@@ -24,6 +33,7 @@ double distancia_enclidiana(Object a, Object b){
 	for(int i=0;i<b.N;i++){
 		ret += pow((a.data[i] - b.data[i]),2);
 	}
+	// cout << sqrt(ret) << endl;
 	return sqrt(ret);
 }
 
@@ -125,6 +135,7 @@ void ant::drop(){
 		double f = funcao_similaridade(this->data_up,this->matrix,this->x_Dimension,this->y_Dimension,this->vision,this->x,this->y);
     	double probabilidade = pd(f) * 100;
     	aux = rand() % 100;
+    	// cout << probabilidade << endl;
 		pthread_mutex_lock(&mtx);
     	if(aux < probabilidade && matrix[this->x][this->y].type==0){
     		this->carregada = false;

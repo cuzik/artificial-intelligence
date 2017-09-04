@@ -17,7 +17,7 @@ int ant_alive = 25;
 int ant_vision = 5;
 int x_Dimension = 100;
 int y_Dimension = 100;
-int num_limit_steps = 5000000;
+int num_limit_steps = -1;
 
 int N = 2;
 
@@ -161,6 +161,7 @@ void position_dead_ants(){
     int x,y;
     int ant_dead;
     std::cin >> ant_dead;
+    std::cin >> N;
     for(int i=0;i<x_Dimension;i++){
         for(int j=0;j<y_Dimension;j++){
             matrix[i][j].data = (double *)malloc(sizeof(double)*N);
@@ -250,7 +251,7 @@ void *ant_animated(void *arg){
     int id = (int&) arg;
     int steps = 0;
     printf("Ant number %2d is on.\n",id);
-    while(run && (steps < num_limit_steps || ants[id].carregada)){
+    while(run && (steps != num_limit_steps || ants[id].carregada)){
         steps++;
         ants[id].move();
         ants[id].pick_up();

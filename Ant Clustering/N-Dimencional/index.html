@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pr-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link rel="stylesheet" href="src/styles/monokai-sublime.css">
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+  <script src="src/languages/cpp.js"></script>
+  <script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+</head>
+<body>
+  <h1>Teste</h1>
+  
+  <pre>
+    <code contenteditable="true">
+      #include "bsdkjbskjdbfkjs.h"
+      using namespace std;
+      int main(){
+        cout << "Quaéééééééé" << endl;
+        return 0;
+      }
+    </code>
+  </pre>
+
+  <script>
+    window.setInterval(function() {
+      $(document).ready(function() {
+        $('pre code').each(function(i, block) {
+          hljs.highlightBlock(block);
+        });
+      });
+    }, 100);
+  </script>
+</body>
+</html>
