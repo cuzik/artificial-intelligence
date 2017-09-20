@@ -2,7 +2,7 @@
 
 ## Agrupamento de Dados
 
- Algoritmo baseado no comportamento de formigas em sua formigueiro.
+ Algoritmo baseado no comportamento de formigas em seu formigueiro.
  
  * Versão paralela feita com pthreads.h
  
