@@ -271,7 +271,9 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
             }
         }
         matrix_mirror[to_do[i].first][to_do[i].second].first = -1;
-        print_stage(to_do);
+        if(rand() % 6 == 0){
+            print_stage(to_do);
+        }
         to_do.erase(to_do.begin());
         to_do = order(to_do);
     }
@@ -379,7 +381,9 @@ std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> 
         }
         usleep(30000);
         matrix_mirror[to_do[i].first][to_do[i].second].first = -1;
-        print_stage(to_do);
+        if(rand() % 2){
+            print_stage(to_do);
+        }
         to_do.erase(to_do.begin());
         to_do = order_a(to_do,a,b);
     }

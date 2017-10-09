@@ -1,18 +1,31 @@
 ### Search
-BFS
-Dijkstra
-A*
-DFS
 
-0 grass
-1 mountain
-2 swamp
-3 fire
+#### Functions Search
+
+| Algorithm Names | Progress | Description | 
+| --------------- | -------- | ----------- |
+| BFS             | Done     |             |
+| Dijkstra        | Done     |             |
+| A*              | Done     |             |
+| DFS             |          |             |
+
+#### Map
+
+| Number | Description |
+| ------ | ----------- |
+| 0      | Grass       |
+| 1      | Mountain    |
+| 2      | Swamp       |
+| 3      | Fire        |
 
 ## Compile
 
-```$ make```
+```shell
+$ make
+```
 
 ## Run
 
-```$ ./hocus_pocus```
+```	shell
+$ ./hocus_pocus x1 y1 x2 y2 type_search [weight_dj weight_as]
+```
