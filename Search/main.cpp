@@ -17,6 +17,9 @@ int TAM_BORDA = 15;
 int x_Dimension = 42;
 int y_Dimension = 42;
 
+int weight_djikstra = 1;
+int weight_a_star = 1;
+
 int LARGURA_TELA = x_Dimension * TAM_CELULA + 2 * TAM_BORDA;
 int ALTURA_TELA = y_Dimension * TAM_CELULA + 2 * TAM_BORDA;
 
@@ -26,19 +29,17 @@ ALLEGRO_FONT *fonte = NULL;
 int **matrix;
 int **matrix_total_weight;
 std::vector< std::vector< std::pair<int, std::vector< std::pair< int,int > > > > > matrix_mirror;
-// int **matrix_mirror;
 
 bool inicializar();
 void matrix_draw_loading();
 void matrix_draw();
 void read_keyboard();
 void draw_way(std::pair<int,int> steep);
+void draw_final_way(std::pair<int,int> steep);
 void read_map();
 std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b);
 std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int> b);
 std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> b);
-std::vector<std::pair<int,int>> search_way_teste();
-
 
 bool run = true;
 
@@ -63,6 +64,11 @@ int main(int argc, char const *argv[]){
     b.first  = atoi(argv[3]);
     b.second = atoi(argv[4]);
 
+    if(argc > 6){
+        weight_djikstra = atoi(argv[6]);
+        weight_a_star = atoi(argv[7]);
+    }
+
     std::vector<std::pair<int,int>> way;
     if(atoi(argv[5]) == 1){
         way = bfs(a,b);
@@ -71,7 +77,7 @@ int main(int argc, char const *argv[]){
     }else if(atoi(argv[5]) == 3){
         way = a_star(a,b);
     }else{
-        way = djikstra(a,b);
+        way = bfs(a,b);
     }
     int len = (int) way.size();
     int wei = matrix_total_weight[b.first][b.second];
@@ -82,7 +88,7 @@ int main(int argc, char const *argv[]){
         al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "steeps: %i -\t weight: %i",len,wei);
         matrix_draw();
         for(int i=0; i<(int) way.size();i++){
-            draw_way(way[i]);
+            draw_final_way(way[i]);
             al_flip_display();
             usleep(30000);
         }
@@ -129,7 +135,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_total_weight[aux.first][aux.second] = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
                 }
             }
-            print_stage(to_do);
+            // print_stage(to_do);
             // Rigth
             if(to_do[i].second+1<42){
                 std::pair< int, int> aux;
@@ -143,7 +149,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_total_weight[aux.first][aux.second] = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
                 }
             }
-            print_stage(to_do);
+            // print_stage(to_do);
             // Left
             if(to_do[i].second-1>=0){
                 std::pair< int, int> aux;
@@ -157,7 +163,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_total_weight[aux.first][aux.second] = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
                 }
             }
-            print_stage(to_do);
+            // print_stage(to_do);
             // Down
             if(to_do[i].first+1<42){
                 std::pair< int, int> aux;
@@ -171,9 +177,9 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_total_weight[aux.first][aux.second] = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
                 }
             }
-            print_stage(to_do);
+            // print_stage(to_do);
         }
-        // print_stage(to_do);
+        print_stage(to_do);
         to_do = new_to_do;
     }
     return to_do;
@@ -182,6 +188,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
 std::vector<std::pair<int,int>> order(std::vector<std::pair<int,int>> vector){
     std::vector<int> weight;
     std::pair<int,int> aux;
+    int aux2;
     for(int i=0; i<(int) vector.size(); i++){
         weight.push_back(matrix_total_weight[vector[i].first][vector[i].second]);
     }
@@ -189,8 +196,11 @@ std::vector<std::pair<int,int>> order(std::vector<std::pair<int,int>> vector){
         for(int j = 0; j < (int) weight.size() - 1; j++){
             if(weight[j] > weight[j+1]){
                 aux         = vector[j];
+                aux2         = weight[j];
                 vector[j]   = vector[j + 1];
+                weight[j]   = weight[j + 1];
                 vector[j+1] = aux;
+                weight[j+1] = aux2;
             }
         }
     }
@@ -208,7 +218,7 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
         if(to_do[i].first == b.first && to_do[i].second == b.second){
             return way;
         }
-        // Up
+        // Upv
         if(to_do[i].first-1>=0){
             std::pair< int, int> aux;
             aux.first = to_do[i].first-1;
@@ -269,25 +279,27 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
 }
 
 double distance(std::pair<int,int> a, std::pair<int,int> b){
-    return sqrt(pow(a.first-b.first,2) + pow(a.second-b.second,2));
+    return abs(a.first-b.first) + abs(a.second-b.second);
+    // return sqrt(pow(a.first-b.first,2) + pow(a.second-b.second,2));
 }
 
 std::vector<std::pair<int,int>> order_a(std::vector<std::pair<int,int>> vector,std::pair<int,int> a, std::pair<int,int> b){
     std::vector<double> weight;
     std::pair<int,int> aux;
+    double aux2;
     for(int i=0; i<(int) vector.size(); i++){
-        double max = distance(a,matrix_mirror[vector[i].first][vector[i].second].second.back()) + distance(b,matrix_mirror[vector[i].first][vector[i].second].second.back());
-        if(distance(a,vector[i]) + distance(b,vector[i]) > max){
-            max = distance(a,vector[i]) + distance(b,vector[i]);
-        }
-        weight.push_back(max);
+        int max = distance(b,vector[i]);
+        weight.push_back(weight_a_star*max+weight_djikstra*matrix_total_weight[vector[i].first][vector[i].second]);
     }
     for(int i = 1; i < (int) weight.size(); i++){
         for(int j = 0; j < (int) weight.size() - 1; j++){
             if(weight[j] > weight[j+1]){
                 aux         = vector[j];
+                aux2        = weight[j];
                 vector[j]   = vector[j + 1];
+                weight[j]   = weight[j + 1];
                 vector[j+1] = aux;
+                weight[j+1] = aux2;
             }
         }
     }
@@ -310,12 +322,14 @@ std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> 
             std::pair< int, int> aux;
             aux.first = to_do[i].first-1;
             aux.second = to_do[i].second;
-            int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
-            if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
-                to_do.push_back(aux);
+            if(matrix_mirror[aux.first][aux.second].first != -1){
+                int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
+                if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
+                    to_do.push_back(aux);
 
-                matrix_total_weight[aux.first][aux.second] = new_weight;
-                matrix_mirror[aux.first][aux.second].second = way;
+                    matrix_total_weight[aux.first][aux.second] = new_weight;
+                    matrix_mirror[aux.first][aux.second].second = way;
+                }
             }
         }
         // Rigth
@@ -323,12 +337,14 @@ std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> 
             std::pair< int, int> aux;
             aux.first = to_do[i].first;
             aux.second = to_do[i].second+1;
-            int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
-            if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
-                to_do.push_back(aux);
+            if(matrix_mirror[aux.first][aux.second].first != -1){
+                int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
+                if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
+                    to_do.push_back(aux);
 
-                matrix_total_weight[aux.first][aux.second] = new_weight;
-                matrix_mirror[aux.first][aux.second].second = way;
+                    matrix_total_weight[aux.first][aux.second] = new_weight;
+                    matrix_mirror[aux.first][aux.second].second = way;
+                }
             }
         }
         // Left
@@ -336,12 +352,14 @@ std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> 
             std::pair< int, int> aux;
             aux.first = to_do[i].first;
             aux.second = to_do[i].second-1;
-            int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
-            if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
-                to_do.push_back(aux);
+            if(matrix_mirror[aux.first][aux.second].first != -1){
+                int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
+                if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
+                    to_do.push_back(aux);
 
-                matrix_total_weight[aux.first][aux.second] = new_weight;
-                matrix_mirror[aux.first][aux.second].second = way;
+                    matrix_total_weight[aux.first][aux.second] = new_weight;
+                    matrix_mirror[aux.first][aux.second].second = way;
+                }
             }
         }
         // Down
@@ -349,61 +367,23 @@ std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> 
             std::pair< int, int> aux;
             aux.first = to_do[i].first+1;
             aux.second = to_do[i].second;
-            int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
-            if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
-                to_do.push_back(aux);
+            if(matrix_mirror[aux.first][aux.second].first != -1){
+                int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + type_weight[matrix[aux.first][aux.second]];
+                if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
+                    to_do.push_back(aux);
 
-                matrix_total_weight[aux.first][aux.second] = new_weight;
-                matrix_mirror[aux.first][aux.second].second = way;
+                    matrix_total_weight[aux.first][aux.second] = new_weight;
+                    matrix_mirror[aux.first][aux.second].second = way;
+                }
             }
         }
+        usleep(30000);
         matrix_mirror[to_do[i].first][to_do[i].second].first = -1;
         print_stage(to_do);
         to_do.erase(to_do.begin());
         to_do = order_a(to_do,a,b);
     }
     return to_do;
-}
-
-
-std::vector<std::pair<int,int>> search_way_teste(){
-    std::vector<std::pair<int,int>> way;
-    std::pair<int,int> aux;
-    aux.first  = 1;
-    aux.second = 1;
-    way.push_back(aux);    
-    aux.first  = 1;
-    aux.second = 1;
-    way.push_back(aux);    
-    aux.first  = 1;
-    aux.second = 2;
-    way.push_back(aux);    
-    aux.first  = 1;
-    aux.second = 3;
-    way.push_back(aux);    
-    aux.first  = 1;
-    aux.second = 4;
-    way.push_back(aux);    
-    aux.first  = 2;
-    aux.second = 4;
-    way.push_back(aux);    
-    aux.first  = 2;
-    aux.second = 5;
-    way.push_back(aux);    
-    aux.first  = 2;
-    aux.second = 6;
-    way.push_back(aux);    
-    aux.first  = 3;
-    aux.second = 6;
-    way.push_back(aux);    
-    aux.first  = 4;
-    aux.second = 6;
-    way.push_back(aux);    
-    aux.first  = 5;
-    aux.second = 6;
-    way.push_back(aux);
-
-    return way; 
 }
 
 void read_map(){
@@ -467,6 +447,11 @@ void matrix_draw(){
 void draw_way(std::pair<int,int> steep){
     // al_draw_filled_rectangle(TAM_BORDA+(steep.first*TAM_CELULA), TAM_BORDA+(steep.second*TAM_CELULA),TAM_BORDA+((steep.first+1)*TAM_CELULA), TAM_BORDA+((steep.second+1)*TAM_CELULA), al_map_rgb(0, 0, 0));
     al_draw_filled_circle(TAM_BORDA+(steep.second*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(steep.first*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(160, 0, 128));
+}
+
+void draw_final_way(std::pair<int,int> steep){
+    // al_draw_filled_rectangle(TAM_BORDA+(steep.first*TAM_CELULA), TAM_BORDA+(steep.second*TAM_CELULA),TAM_BORDA+((steep.first+1)*TAM_CELULA), TAM_BORDA+((steep.second+1)*TAM_CELULA), al_map_rgb(0, 0, 0));
+    al_draw_filled_circle(TAM_BORDA+(steep.second*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(steep.first*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(0, 255, 0));
 }
 
 bool inicializar(){
