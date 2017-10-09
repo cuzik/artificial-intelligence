@@ -79,10 +79,13 @@ int main(int argc, char const *argv[]){
     return 0;
 }
 
-void print_stage(){
+void print_stage(std::vector<std::pair<int,int>> to_do){
     al_clear_to_color(al_map_rgb(0, 0, 0));
     al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "oiee");
     matrix_draw_loading();
+    for(int i=0; i<to_do.size();i++){
+        draw_way(to_do[i]);
+    }
     al_flip_display();
 }
 
@@ -110,7 +113,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_mirror[aux.first][aux.second].second = way;
                 }
             }
-            // print_stage();
+            // print_stage(to_do);
             // Rigth
             if(to_do[i].second+1<42){
                 std::pair< int, int> aux;
@@ -123,7 +126,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_mirror[aux.first][aux.second].second = way;
                 }
             }
-            // print_stage();
+            // print_stage(to_do);
             // Left
             if(to_do[i].second-1>=0){
                 std::pair< int, int> aux;
@@ -136,7 +139,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_mirror[aux.first][aux.second].second = way;
                 }
             }
-            // print_stage();
+            // print_stage(to_do);
             // Down
             if(to_do[i].first+1<42){
                 std::pair< int, int> aux;
@@ -149,9 +152,9 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_mirror[aux.first][aux.second].second = way;
                 }
             }
-            // print_stage();
+            // print_stage(to_do);
         }
-        print_stage();
+        print_stage(to_do);
         to_do = new_to_do;
     }
     return to_do;
@@ -183,7 +186,7 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
     while(true){
         std::vector<std::pair<int,int>> way = matrix_mirror[to_do[i].first][to_do[i].second].second;
         way.push_back(to_do[i]);
-        std::cout << matrix_total_weight[to_do[i].first][to_do[i].second] << std::endl;
+        std::cout << to_do.size() << std::endl;
         if(to_do[i].first == b.first && to_do[i].second == b.second){
             return way;
         }
@@ -201,7 +204,7 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
                 matrix_mirror[aux.first][aux.second].second = way;
             }
         }
-        // print_stage();
+        // print_stage(to_do);
         // Rigth
         if(to_do[i].second+1<42){
             std::pair< int, int> aux;
@@ -216,7 +219,7 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
                 matrix_mirror[aux.first][aux.second].second = way;
             }
         }
-        // print_stage();
+        // print_stage(to_do);
         // Left
         if(to_do[i].second-1>=0){
             std::pair< int, int> aux;
@@ -231,7 +234,7 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
                 matrix_mirror[aux.first][aux.second].second = way;
             }
         }
-        // print_stage();
+        // print_stage(to_do);
         // Down
         if(to_do[i].first+1<42){
             std::pair< int, int> aux;
@@ -247,13 +250,8 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
             }
         }
         matrix_mirror[to_do[i].first][to_do[i].second].first = -1;
-        print_stage();
-        for(int k = 0; k<x_Dimension; k++){
-            for(int j = 0; j<y_Dimension; j++){
-                std::cout << matrix_total_weight[k][j] << ' ';
-            }
-            std::cout << std::endl;
-        }
+        print_stage(to_do);
+        // usleep(300000);
         to_do.erase(to_do.begin());
         to_do = order(to_do);
     }
