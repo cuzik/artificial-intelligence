@@ -1,4 +1,13 @@
 ### Search
+BFS
+A*
+Dijkstra
+DFS
+
+0 grass
+1 mountain
+2 swamp
+3 fire
 
 ## Compile
 
