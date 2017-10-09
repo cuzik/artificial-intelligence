@@ -24,6 +24,7 @@ ALLEGRO_DISPLAY *janela = NULL;
 ALLEGRO_EVENT_QUEUE *fila_eventos = NULL;
 ALLEGRO_FONT *fonte = NULL;
 int **matrix;
+int **matrix_total_weight;
 std::vector< std::vector< std::pair<int, std::vector< std::pair< int,int > > > > > matrix_mirror;
 // int **matrix_mirror;
 
@@ -34,6 +35,7 @@ void read_keyboard();
 void draw_way(std::pair<int,int> steep);
 void read_map();
 std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b);
+std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int> b);
 std::vector<std::pair<int,int>> search_way_teste();
 
 
@@ -52,12 +54,12 @@ int main(int argc, char const *argv[]){
     read_map();
     
     std::pair<int,int> a;
-    a.first  = 22;
-    a.second = 15;
+    a.first  = 21;
+    a.second = 21;
     std::pair<int,int> b;
-    b.first  = 23;
-    b.second = 25;
-    std::vector<std::pair<int,int>> way = bfs(a,b);
+    b.first  = 41;
+    b.second = 41;
+    std::vector<std::pair<int,int>> way = djikstra(a,b);
 
     while(run){
         read_keyboard();
@@ -89,9 +91,6 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
     while(true){
         std::vector<std::pair<int,int>> new_to_do;
         for(int i=0;i<to_do.size();i++){
-            // if(matrix_mirror[to_do[i].first][to_do[i].second].first == -1){
-                // continue;
-            // }
             std::vector<std::pair<int,int>> way = matrix_mirror[to_do[i].first][to_do[i].second].second;
             way.push_back(to_do[i]);
             if(to_do[i].first == b.first && to_do[i].second == b.second){
@@ -109,7 +108,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_mirror[aux.first][aux.second].second = way;
                 }
             }
-            print_stage();
+            // print_stage();
             // Rigth
             if(to_do[i].second+1<42){
                 std::pair< int, int> aux;
@@ -122,7 +121,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_mirror[aux.first][aux.second].second = way;
                 }
             }
-            print_stage();
+            // print_stage();
             // Left
             if(to_do[i].second-1>=0){
                 std::pair< int, int> aux;
@@ -135,7 +134,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_mirror[aux.first][aux.second].second = way;
                 }
             }
-            print_stage();
+            // print_stage();
             // Down
             if(to_do[i].first+1<42){
                 std::pair< int, int> aux;
@@ -148,12 +147,111 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
                     matrix_mirror[aux.first][aux.second].second = way;
                 }
             }
-            print_stage();
+            // print_stage();
         }
+        print_stage();
         to_do = new_to_do;
     }
     return to_do;
 }
+
+std::vector<std::pair<int,int>> order(std::vector<std::pair<int,int>> vector){
+    std::vector<int> weight;
+    std::pair<int,int> aux;
+    for(int i=0; i<vector.size(); i++){
+        weight.push_back(matrix_total_weight[vector[i].first][vector[i].second]);
+    }
+    for(int i = 1; i < weight.size(); i++){
+        for(int j = 0; j < weight.size() - 1; j++){
+            if(weight[j] > weight[j+1]){
+                aux         = vector[j];
+                vector[j]   = vector[j + 1];
+                vector[j+1] = aux;
+            }
+        }
+    }
+    return vector;
+}
+
+std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int> b){
+    std::vector<std::pair<int,int>> to_do;
+    to_do.push_back(a);
+    matrix_mirror[a.first][a.second].first = -1;
+    while(true){
+        std::vector<std::pair<int,int>> new_to_do;
+        for(int i=0;i<to_do.size();i++){
+            std::vector<std::pair<int,int>> way = matrix_mirror[to_do[i].first][to_do[i].second].second;
+            way.push_back(to_do[i]);
+            if(to_do[i].first == b.first && to_do[i].second == b.second){
+                return way;
+            }
+            // Up
+            if(to_do[i].first-1>=0){
+                std::pair< int, int> aux;
+                aux.first = to_do[i].first-1;
+                aux.second = to_do[i].second;
+                int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + matrix[aux.first][aux.second];
+                if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
+                    new_to_do.push_back(aux);
+
+                    matrix_total_weight[aux.first][aux.second] = new_weight;
+                    matrix_mirror[aux.first][aux.second].first = -1;
+                    matrix_mirror[aux.first][aux.second].second = way;
+                }
+            }
+            // print_stage();
+            // Rigth
+            if(to_do[i].second+1<42){
+                std::pair< int, int> aux;
+                aux.first = to_do[i].first;
+                aux.second = to_do[i].second+1;
+                int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + matrix[aux.first][aux.second];
+                if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
+                    new_to_do.push_back(aux);
+
+                    matrix_total_weight[aux.first][aux.second] = new_weight;
+                    matrix_mirror[aux.first][aux.second].first = -1;
+                    matrix_mirror[aux.first][aux.second].second = way;
+                }
+            }
+            // print_stage();
+            // Left
+            if(to_do[i].second-1>=0){
+                std::pair< int, int> aux;
+                aux.first = to_do[i].first;
+                aux.second = to_do[i].second-1;
+                int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + matrix[aux.first][aux.second];
+                if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
+                    new_to_do.push_back(aux);
+
+                    matrix_total_weight[aux.first][aux.second] = new_weight;
+                    matrix_mirror[aux.first][aux.second].first = -1;
+                    matrix_mirror[aux.first][aux.second].second = way;
+                }
+            }
+            // print_stage();
+            // Down
+            if(to_do[i].first+1<42){
+                std::pair< int, int> aux;
+                aux.first = to_do[i].first+1;
+                aux.second = to_do[i].second;
+                int new_weight = matrix_total_weight[to_do[i].first][to_do[i].second] + matrix[aux.first][aux.second];
+                if(matrix_total_weight[aux.first][aux.second] == 0 || new_weight < matrix_total_weight[aux.first][aux.second]){
+                    new_to_do.push_back(aux);
+
+                    matrix_total_weight[aux.first][aux.second] = new_weight;
+                    matrix_mirror[aux.first][aux.second].first = -1;
+                    matrix_mirror[aux.first][aux.second].second = way;
+                }
+            }
+            // print_stage();
+        }
+        print_stage();
+        to_do = order(new_to_do);
+    }
+    return to_do;
+}
+
 
 std::vector<std::pair<int,int>> search_way_teste(){
     std::vector<std::pair<int,int>> way;
@@ -197,19 +295,18 @@ std::vector<std::pair<int,int>> search_way_teste(){
 
 void read_map(){
     matrix = (int**) malloc (sizeof(int*)*x_Dimension);
+    matrix_total_weight = (int**) malloc (sizeof(int*)*x_Dimension);
     for(int i = 0; i<x_Dimension;i++){
         matrix[i] = (int*) malloc (sizeof(int)*y_Dimension);
+        matrix_total_weight[i] = (int*) malloc (sizeof(int)*y_Dimension);
     }
     FILE *in = fopen("mapa","r");
     for(int i = 0; i<x_Dimension; i++){
-        for(int j = 0; j<y_Dimension; j++){
-            matrix[i][j] = fgetc(in) - 48;
-            fgetc(in);
-        }
-    }
-    for(int i = 0; i<x_Dimension; i++){
         std::vector< std::pair< int,std::vector< std::pair< int,int > > > > aux;
         for(int j = 0; j<y_Dimension; j++){
+            matrix[i][j] = fgetc(in) - 48;
+            matrix_total_weight[i][j] = 0;
+            fgetc(in);
             std::pair<int,std::vector< std::pair< int,int > > > aux2;
             aux2.first = matrix[i][j];
             aux.push_back(aux2);

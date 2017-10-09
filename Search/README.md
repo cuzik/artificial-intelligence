@@ -1,7 +1,7 @@
 ### Search
 BFS
-A*
 Dijkstra
+A*
 DFS
 
 0 grass
