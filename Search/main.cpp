@@ -37,11 +37,15 @@ void read_keyboard();
 void draw_way(std::pair<int,int> steep);
 void draw_final_way(std::pair<int,int> steep);
 void read_map();
+void zera_mirror();
 std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b);
+std::vector<std::pair<int,int>> dfs(std::vector<std::pair<int,int>> way, std::pair<int,int> a, std::pair<int,int> b);
+std::vector<std::pair<int,int>> dfs_i(std::vector<std::pair<int,int>> way, std::pair<int,int> a, std::pair<int,int> b, int max_len, int atual_len);
 std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int> b);
 std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> b);
 
 bool run = true;
+int expa = 0;
 
 int color[4][3] = {
                     {137, 168, 0  }, // grass
@@ -54,7 +58,7 @@ int type_weight[4] = {1,5,10,15};
 
 int main(int argc, char const *argv[]){
     srand( (unsigned)time(NULL) );
-    inicializar();
+    // inicializar();
     read_map();
     
     std::pair<int,int> a;
@@ -76,38 +80,51 @@ int main(int argc, char const *argv[]){
         way = djikstra(a,b);
     }else if(atoi(argv[5]) == 3){
         way = a_star(a,b);
+    }else if(atoi(argv[5]) == 4){
+        way = dfs(way,a,b);
     }else{
-        way = bfs(a,b);
+        std::cout << "Ta errado esse último argumento ai fera" << std::endl;
+        return 0;
     }
     int len = (int) way.size();
     int wei = matrix_total_weight[b.first][b.second];
 
-    while(run){
-        read_keyboard();
-        al_clear_to_color(al_map_rgb(0, 0, 0));
-        al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "steeps: %i -\t weight: %i",len,wei);
-        matrix_draw();
-        for(int i=0; i<(int) way.size();i++){
-            draw_final_way(way[i]);
-            al_flip_display();
-            usleep(30000);
-        }
-        al_flip_display();
-    }
+    std::cout << "step: " << len << " cost: " << wei << " expa-nodes: " << expa << std::endl;
 
-    al_destroy_event_queue(fila_eventos);
-    al_destroy_display(janela);
+    // while(run){
+    //     read_keyboard();
+    //     al_clear_to_color(al_map_rgb(0, 0, 0));
+    //     al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "steeps: %i -\t weight: %i",len,wei);
+    //     matrix_draw();
+    //     for(int i=0; i<(int) way.size();i++){
+    //         draw_final_way(way[i]);
+    //         al_flip_display();
+    //         usleep(30000);
+    //     }
+    //     al_flip_display();
+    // }
+
+    // al_destroy_event_queue(fila_eventos);
+    // al_destroy_display(janela);
     return 0;
 }
 
 void print_stage(std::vector<std::pair<int,int>> to_do){
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "to dos: %i ", (int) to_do.size());
-    matrix_draw_loading();
-    for(int i=0; i<(int) to_do.size();i++){
-        draw_way(to_do[i]);
-    }
-    al_flip_display();
+    // al_clear_to_color(al_map_rgb(0, 0, 0));
+    // al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "to dos: %i ", (int) to_do.size());
+    // matrix_draw_loading();
+    // for(int i=0; i<(int) to_do.size();i++){
+    //     draw_way(to_do[i]);
+    // }
+    // al_flip_display();
+}
+
+void print_stage_dfs(std::pair<int,int> to_do, int max_len, int atual_len){
+    // al_clear_to_color(al_map_rgb(0, 0, 0));
+    // al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "max-len: %i atual-len: %i", max_len, atual_len);
+    // matrix_draw_loading();
+    // draw_way(to_do);
+    // al_flip_display();
 }
 
 std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
@@ -117,6 +134,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
     while(true){
         std::vector<std::pair<int,int>> new_to_do;
         for(int i=0;i<(int) to_do.size();i++){
+            expa++;
             std::vector<std::pair<int,int>> way = matrix_mirror[to_do[i].first][to_do[i].second].second;
             way.push_back(to_do[i]);
             if(to_do[i].first == b.first && to_do[i].second == b.second){
@@ -185,6 +203,114 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
     return to_do;
 }
 
+bool done = false;
+std::vector<std::pair<int,int>> rest;
+
+std::vector<std::pair<int,int>> dfs(std::vector<std::pair<int,int>> way, std::pair<int,int> a, std::pair<int,int> b){
+    std::vector<std::pair<int,int>> rest_final;
+    int i = 1;
+    while(done==false){
+        i++;
+        zera_mirror();
+        rest_final = dfs_i(way,a,b,i,0);
+    }
+    return rest_final;
+}
+
+// matrix_mirror[to_do[i].first][to_do[i].second].second;
+std::vector<std::pair<int,int>> dfs_i(std::vector<std::pair<int,int>> way, std::pair<int,int> a, std::pair<int,int> b, int max_len, int atual_len){
+    expa++;
+    atual_len++;
+    if(max_len==atual_len){
+        return rest;
+    }
+    if(a.first == b.first && a.second == b.second){
+        done = true;
+        return way;
+    }
+    // Up
+    if(a.first-1>=0){
+        // std::cout << "up" << std::endl;
+        std::pair< int, int> aux;
+        aux.first = a.first-1;
+        aux.second = a.second;
+        if(matrix_mirror[aux.first][aux.second].first != -1){
+            way.push_back(aux);
+            matrix_mirror[aux.first][aux.second].first = -1;
+            matrix_mirror[aux.first][aux.second].second = way;
+            matrix_total_weight[aux.first][aux.second] = matrix_total_weight[a.first][a.second] + type_weight[matrix[aux.first][aux.second]];
+            // print_stage_dfs(a, max_len, atual_len);
+            rest = dfs_i(way,aux,b,max_len,atual_len);
+            if(done){
+                return rest;
+            }
+            matrix_mirror[aux.first][aux.second].first = 0;
+            way.pop_back();
+        }
+    }
+    // Rigth
+    if(a.second+1<42){
+        // std::cout << "r" << std::endl;
+        std::pair< int, int> aux;
+        aux.first = a.first;
+        aux.second = a.second+1;
+        if(matrix_mirror[aux.first][aux.second].first != -1){
+            way.push_back(aux);
+            matrix_mirror[aux.first][aux.second].first = -1;
+            matrix_mirror[aux.first][aux.second].second = way;
+            matrix_total_weight[aux.first][aux.second] = matrix_total_weight[a.first][a.second] + type_weight[matrix[aux.first][aux.second]];
+            // print_stage_dfs(a, max_len, atual_len);
+            rest = dfs_i(way,aux,b,max_len,atual_len);
+            if(done){
+                return rest;
+            }
+            matrix_mirror[aux.first][aux.second].first = 0;
+            way.pop_back();
+        }
+    }
+    // Left
+    if(a.second-1>=0){
+        // std::cout << "l" << std::endl;
+        std::pair< int, int> aux;
+        aux.first = a.first;
+        aux.second = a.second-1;
+        if(matrix_mirror[aux.first][aux.second].first != -1){
+            way.push_back(aux);
+            matrix_mirror[aux.first][aux.second].first = -1;
+            matrix_mirror[aux.first][aux.second].second = way;
+            matrix_total_weight[aux.first][aux.second] = matrix_total_weight[a.first][a.second] + type_weight[matrix[aux.first][aux.second]];
+            // print_stage_dfs(a, max_len, atual_len);
+            rest = dfs_i(way,aux,b,max_len,atual_len);
+            if(done){
+                return rest;
+            }
+            matrix_mirror[aux.first][aux.second].first = 0;
+            way.pop_back();
+        }
+    }
+    // Down
+    if(a.first+1<42){
+        // std::cout << "dw" << std::endl;
+        std::pair< int, int> aux;
+        aux.first = a.first+1;
+        aux.second = a.second;
+        if(matrix_mirror[aux.first][aux.second].first != -1){
+            way.push_back(aux);
+            matrix_mirror[aux.first][aux.second].first = -1;
+            matrix_mirror[aux.first][aux.second].second = way;
+            matrix_total_weight[aux.first][aux.second] = matrix_total_weight[a.first][a.second] + type_weight[matrix[aux.first][aux.second]];
+            // print_stage_dfs(a, max_len, atual_len);
+            rest = dfs_i(way,aux,b,max_len,atual_len);
+            if(done){
+                return rest;
+            }
+            matrix_mirror[aux.first][aux.second].first = 0;
+            way.pop_back();
+        }
+    }
+    return rest;
+}
+
 std::vector<std::pair<int,int>> order(std::vector<std::pair<int,int>> vector){
     std::vector<int> weight;
     std::pair<int,int> aux;
@@ -213,6 +339,7 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
     matrix_mirror[a.first][a.second].first = -1;
     int i=0;
     while(true){
+        expa++;
         std::vector<std::pair<int,int>> way = matrix_mirror[to_do[i].first][to_do[i].second].second;
         way.push_back(to_do[i]);
         if(to_do[i].first == b.first && to_do[i].second == b.second){
@@ -314,6 +441,7 @@ std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> 
     matrix_mirror[a.first][a.second].first = -1;
     int i=0;
     while(true){
+        expa++;
         std::vector<std::pair<int,int>> way = matrix_mirror[to_do[i].first][to_do[i].second].second;
         way.push_back(to_do[i]);
         if(to_do[i].first == b.first && to_do[i].second == b.second){
@@ -379,11 +507,11 @@ std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> 
                 }
             }
         }
-        usleep(30000);
+        // usleep(30000);
         matrix_mirror[to_do[i].first][to_do[i].second].first = -1;
-        if(rand() % 2){
+        //if(rand() % 2){
             print_stage(to_do);
-        }
+        //}
         to_do.erase(to_do.begin());
         to_do = order_a(to_do,a,b);
     }
@@ -412,6 +540,18 @@ void read_map(){
     }
 }
 
+void zera_mirror(){
+    for(int i = 0; i<x_Dimension; i++){
+        std::vector< std::pair< int,std::vector< std::pair< int,int > > > > aux;
+        for(int j = 0; j<y_Dimension; j++){
+            std::pair<int,std::vector< std::pair< int,int > > > aux2;
+            aux2.first = 0;
+            aux.push_back(aux2);
+        }
+        matrix_mirror.push_back(aux);
+    }
+}
+
 void read_keyboard(){
     while(!al_is_event_queue_empty(fila_eventos)){
         ALLEGRO_EVENT evento;
@@ -431,7 +571,7 @@ void matrix_draw_loading(){
     for(i=0;i<x_Dimension;i++){
         for(j=0;j<y_Dimension;j++){
             if(matrix_mirror[i][j].first != -1){
-                al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(color[matrix_mirror[i][j].first][0], color[matrix_mirror[i][j].first][1], color[matrix_mirror[i][j].first][2]));
+                al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(color[matrix[i][j]][0], color[matrix[i][j]][1], color[matrix[i][j]][2]));
                 // al_draw_filled_circle(TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(color[matrix[i][j]][0], color[matrix[i][j]][1], color[matrix[i][j]][2]));
             }
         }
