@@ -221,12 +221,12 @@ std::vector<std::pair<int,int>> dfs(std::vector<std::pair<int,int>> way, std::pa
 std::vector<std::pair<int,int>> dfs_i(std::vector<std::pair<int,int>> way, std::pair<int,int> a, std::pair<int,int> b, int max_len, int atual_len){
     expa++;
     atual_len++;
-    if(max_len==atual_len){
-        return rest;
-    }
     if(a.first == b.first && a.second == b.second){
         done = true;
         return way;
+    }
+    if(max_len==atual_len){
+        return rest;
     }
     // Up
     if(a.first-1>=0){
@@ -244,7 +244,7 @@ std::vector<std::pair<int,int>> dfs_i(std::vector<std::pair<int,int>> way, std::
             if(done){
                 return rest;
             }
-            matrix_mirror[aux.first][aux.second].first = 0;
+            // matrix_mirror[aux.first][aux.second].first = 0;
             way.pop_back();
         }
     }
@@ -264,7 +264,7 @@ std::vector<std::pair<int,int>> dfs_i(std::vector<std::pair<int,int>> way, std::
             if(done){
                 return rest;
             }
-            matrix_mirror[aux.first][aux.second].first = 0;
+            // matrix_mirror[aux.first][aux.second].first = 0;
             way.pop_back();
         }
     }
@@ -284,7 +284,7 @@ std::vector<std::pair<int,int>> dfs_i(std::vector<std::pair<int,int>> way, std::
             if(done){
                 return rest;
             }
-            matrix_mirror[aux.first][aux.second].first = 0;
+            // matrix_mirror[aux.first][aux.second].first = 0;
             way.pop_back();
         }
     }
@@ -304,7 +304,7 @@ std::vector<std::pair<int,int>> dfs_i(std::vector<std::pair<int,int>> way, std::
             if(done){
                 return rest;
             }
-            matrix_mirror[aux.first][aux.second].first = 0;
+            // matrix_mirror[aux.first][aux.second].first = 0;
             way.pop_back();
         }
     }
@@ -541,6 +541,7 @@ void read_map(){
 }
 
 void zera_mirror(){
+std::vector< std::vector< std::pair<int, std::vector< std::pair< int,int > > > > > matrix_mirror1;
     for(int i = 0; i<x_Dimension; i++){
         std::vector< std::pair< int,std::vector< std::pair< int,int > > > > aux;
         for(int j = 0; j<y_Dimension; j++){
@@ -548,8 +549,9 @@ void zera_mirror(){
             aux2.first = 0;
             aux.push_back(aux2);
         }
-        matrix_mirror.push_back(aux);
+        matrix_mirror1.push_back(aux);
     }
+    matrix_mirror = matrix_mirror1;
 }
 
 void read_keyboard(){
