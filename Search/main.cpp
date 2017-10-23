@@ -101,6 +101,7 @@ int main(int argc, char const *argv[]){
     //         al_flip_display();
     //         usleep(30000);
     //     }
+    //     usleep(3000000);
     //     al_flip_display();
     // }
 
@@ -197,7 +198,7 @@ std::vector<std::pair<int,int>> bfs(std::pair<int,int> a, std::pair<int,int> b){
             }
             // print_stage(to_do);
         }
-        print_stage(to_do);
+        // print_stage(to_do);
         to_do = new_to_do;
     }
     return to_do;
@@ -399,7 +400,7 @@ std::vector<std::pair<int,int>> djikstra(std::pair<int,int> a, std::pair<int,int
         }
         matrix_mirror[to_do[i].first][to_do[i].second].first = -1;
         if(rand() % 6 == 0){
-            print_stage(to_do);
+            // print_stage(to_do);
         }
         to_do.erase(to_do.begin());
         to_do = order(to_do);
@@ -510,7 +511,7 @@ std::vector<std::pair<int,int>> a_star(std::pair<int,int> a, std::pair<int,int> 
         // usleep(30000);
         matrix_mirror[to_do[i].first][to_do[i].second].first = -1;
         //if(rand() % 2){
-            print_stage(to_do);
+            // print_stage(to_do);
         //}
         to_do.erase(to_do.begin());
         to_do = order_a(to_do,a,b);
@@ -552,6 +553,12 @@ std::vector< std::vector< std::pair<int, std::vector< std::pair< int,int > > > >
         matrix_mirror1.push_back(aux);
     }
     matrix_mirror = matrix_mirror1;
+    for(int i = 0; i<x_Dimension; i++){
+        std::vector< std::pair< int,std::vector< std::pair< int,int > > > > aux;
+        for(int j = 0; j<y_Dimension; j++){
+            matrix_total_weight[i][j] = 0;
+        }
+    }
 }
 
 void read_keyboard(){
