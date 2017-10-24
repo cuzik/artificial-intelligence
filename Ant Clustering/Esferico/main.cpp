@@ -71,7 +71,7 @@ int main(int argc, char const *argv[]){
         }
     }
     position_dead_ants(matrix, 1);
-    // position_dead_ants(matrix, 2);
+    position_dead_ants(matrix, 2);
     // position_dead_ants(matrix, 3);
     // position_dead_ants(matrix, 4);
     // position_dead_ants(matrix, 5);

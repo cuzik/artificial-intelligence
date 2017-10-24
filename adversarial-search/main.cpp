@@ -12,7 +12,7 @@
 #include <vector>
 #include <cmath>
 
-int TAM_CELULA = 50;
+int TAM_CELULA = 70;
 int TAM_BORDA = 15;
 int x_Dimension = 3;
 int y_Dimension = 3;
@@ -29,12 +29,22 @@ void draw_tab();
 void read_keyboard();
 bool marca_player(int pos_x, int pos_y);
 void troca_jogador();
-int verifica_vencedor();
+int verifica_vencedor(int matriz[3][3]);
+void verifica_fim();
 
-int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};;
+
+
+int min_max(int player, int profundidade, bool adversario, int matrix[3][3]);
+
+
+
+int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
 
 int x=0;
 int y=0;
+
+int next_x = 0;
+int next_y = 0;
 
 bool run = true;
 
@@ -46,13 +56,19 @@ int main(int argc, char const *argv[]){
     srand( (unsigned)time(NULL) );
     inicializar();
     while(run){
-        read_keyboard();
+        verifica_fim();
         al_clear_to_color(al_map_rgb(0, 0, 0));
         if(player == -1){
             al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tPlayer",jogadas);
+            read_keyboard();
         }else{
             al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tComputer",jogadas);
+            min_max(player,jogadas,false,tabuleiro);
+            tabuleiro[next_x][next_y] = player;
+            jogadas++;
+            troca_jogador();
         }
+
         draw_tab();
         // usleep(3000000);
         al_flip_display();
@@ -60,6 +76,18 @@ int main(int argc, char const *argv[]){
     return 0;
 }
 
+void verifica_fim(){
+    if(verifica_vencedor(tabuleiro)!=0){
+        if(verifica_vencedor(tabuleiro)==-1)
+            std::cout << "Player" << std::endl;
+        else
+            std::cout << "Computer" << std::endl;
+        exit(1);
+    }else if(jogadas == 9){
+        std::cout << "A Tie" << std::endl;
+        exit(1);
+    }
+}
 
 void read_keyboard(){
     while(!al_is_event_queue_empty(fila_eventos)){
@@ -73,11 +101,11 @@ void read_keyboard(){
                     x--;
                 }
             }else if(evento.keyboard.keycode == ALLEGRO_KEY_RIGHT){
-                if(y<=3){
+                if(y<2){
                     y++;
                 }
             }else if(evento.keyboard.keycode == ALLEGRO_KEY_DOWN){
-                if(x<=3){
+                if(x<2){
                     x++;
                 }
             }else if(evento.keyboard.keycode == ALLEGRO_KEY_LEFT){
@@ -88,17 +116,54 @@ void read_keyboard(){
                 if(marca_player(x,y)){
                     jogadas++;
                     troca_jogador();
-                    if(verifica_vencedor()!=0){
-                        if(verifica_vencedor()==-1)
-                            std::cout << "Player" << std::endl;
-                        else
-                            std::cout << "Computer" << std::endl;
-                    }
                 }
             }
         }else if(evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
             run = false;
         }
+    }
+}
+
+int min_max(int player, int profundidade, bool adversario, int matrix[3][3]){
+    int min = 10000;
+    int max = -10000;
+    int aux = 0;
+    if(verifica_vencedor(matrix)!=0 || profundidade==9){
+        // std::cout << profundidade + (verifica_vencedor(matrix) * 10 * player) << std::endl;
+        return profundidade + (verifica_vencedor(matrix) * 10 * player);
+    }
+    if(adversario){
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                if(matrix[i][j]==0){
+                    matrix[i][j]=-player;
+                    aux = min_max(player,profundidade+1,false,matrix);
+                    matrix[i][j]=0;
+                    if(min > aux){
+                        min = aux;
+                        next_x = i;
+                        next_y = j;
+                    }
+                }
+            }
+        }
+        return min;
+    }else{
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                if(matrix[i][j]==0){
+                    matrix[i][j]=player;
+                    aux = min_max(player,profundidade+1,true,matrix);
+                    matrix[i][j]=0;
+                    if(max < aux){
+                        max = aux;
+                        next_x = i;
+                        next_y = j;
+                    }
+                }
+            }
+        }
+        return max;
     }
 }
 
@@ -121,35 +186,42 @@ void draw_tab(){
                 // al_draw_filled_circle(TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(color[matrix[i][j]][0], color[matrix[i][j]][1], color[matrix[i][j]][2]));
             }
             if(tabuleiro[i][j]==1){
-                al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(0, 255, 0), 2.0);
+                // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(0, 255, 0), 2.0);
+                al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(0, 255, 0));
             }else if(tabuleiro[i][j]==-1){
-                al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(255, 0, 0), 2.0);
+                // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(255, 0, 0), 2.0);
+                al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(255, 0, 0));
             }
         }
     }
 }
 
-int verifica_vencedor(){
+int verifica_vencedor(int matriz[3][3]){
     for(int i=0;i<3;i++){
-        if((tabuleiro[i][0] + tabuleiro[i][1] + tabuleiro[i][2]) == 3
-        || (tabuleiro[0][i] + tabuleiro[1][i] + tabuleiro[2][i]) == 3){
+        if((matriz[i][0] + matriz[i][1] + matriz[i][2]) == 3
+        || (matriz[0][i] + matriz[1][i] + matriz[2][i]) == 3){
+            // std::cout << "1" << std::endl;
             return 1;
         }
     }
-    if((tabuleiro[0][0] + tabuleiro[1][1] + tabuleiro[2][2]) == 3
-    || (tabuleiro[2][0] + tabuleiro[1][1] + tabuleiro[0][2]) == 3){
+    if((matriz[0][0] + matriz[1][1] + matriz[2][2]) == 3
+    || (matriz[2][0] + matriz[1][1] + matriz[0][2]) == 3){
+        // std::cout << "1" << std::endl;
         return 1;
     }
     for(int i=0;i<3;i++){
-        if((tabuleiro[i][0] + tabuleiro[i][1] + tabuleiro[i][2]) == -3
-        || (tabuleiro[0][i] + tabuleiro[1][i] + tabuleiro[2][i]) == -3){
+        if((matriz[i][0] + matriz[i][1] + matriz[i][2]) == -3
+        || (matriz[0][i] + matriz[1][i] + matriz[2][i]) == -3){
+            // std::cout << "-1" << std::endl;
             return -1;
         }
     }
-    if((tabuleiro[0][0] + tabuleiro[1][1] + tabuleiro[2][2]) == -3
-    || (tabuleiro[2][0] + tabuleiro[1][1] + tabuleiro[0][2]) == -3){
+    if((matriz[0][0] + matriz[1][1] + matriz[2][2]) == -3
+    || (matriz[2][0] + matriz[1][1] + matriz[0][2]) == -3){
+        // std::cout << "-1" << std::endl;
         return -1;
     }
+    // std::cout << "0" << std::endl;
     return 0;
 }
 
