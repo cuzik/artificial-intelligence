@@ -64,10 +64,8 @@ int main(int argc, char const *argv[]){
         al_clear_to_color(al_map_rgb(0, 0, 0));
         read_keyboard();
         if(player == -1){
-            al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tBob",jogadas);
             // minimax(player,jogadas,false,tabuleiro);
         }else{
-            al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tAna",jogadas);
             minimax(player,jogadas,false,tabuleiro);
         }
 
@@ -232,6 +230,11 @@ void draw_tab(){
                 al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(255, 0, 0));
             }
         }
+    }
+    if(player == -1){
+        al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tBob",jogadas);
+    }else{
+        al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tAna",jogadas);
     }
 }
 
