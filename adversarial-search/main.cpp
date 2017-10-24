@@ -41,47 +41,96 @@ typedef struct ${
 
 int min_max(int player, int profundidade, bool adversario, int matrix[3][3]);
 void minimax(int player, int profundidade, bool adversario, int matrix[3][3]);
-
+void comp_move(int player, int profundidade, bool adversario, int matrix[3][3]);
 
 int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
+
+void player_player();
+void comp_player();
+void comp_comp();
+
+
 
 int x=0;
 int y=0;
 
-int expan = 0;
-
 bool run = true;
-
+int expan = 0;
 int player = -1;
-
 int jogadas = 0;
+int mode;
+int alg;
 
 int main(int argc, char const *argv[]){
     srand( (unsigned)time(NULL) );
     inicializar();
+    if(argc<3){
+        std::cout << "Ta faltando paremetro ai brow\n tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MimiMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
+        return 0;
+    }
+    mode = atoi(argv[1]);
+    alg = atoi(argv[2]);
+    switch(mode){
+        case 0:
+            player_player();
+            break;
+        case 1:
+            comp_player();
+            break;
+        case 2:
+            player = 1;
+            comp_player();
+            break;
+        case 3:
+            comp_comp();
+    }
+    return 0;
+}
+
+void player_player(){
     while(run){
         verifica_fim();
         al_clear_to_color(al_map_rgb(0, 0, 0));
         read_keyboard();
-        if(player == -1){
-            // minimax(player,jogadas,false,tabuleiro);
-        }else{
-            minimax(player,jogadas,false,tabuleiro);
-        }
-
         draw_tab();
-        // usleep(500000);
         al_flip_display();
     }
-    return 0;
+}
+
+void comp_player(){
+    while(run){
+        verifica_fim();
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+        read_keyboard();
+        if(player==1){
+            minimax(player,jogadas,false,tabuleiro);
+        }
+        draw_tab();
+        al_flip_display();
+    }
+}
+
+void comp_comp(){
+    while(run){
+        verifica_fim();
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+        read_keyboard();
+        minimax(player,jogadas,false,tabuleiro);
+        draw_tab();
+        al_flip_display();
+    }
+}
+
+void comp_move(int player, int profundidade, bool adversario, int matrix[3][3]){
+
 }
 
 void verifica_fim(){
     if(verifica_vencedor(tabuleiro)!=0){
         if(verifica_vencedor(tabuleiro)==-1)
-            std::cout << "Player" << std::endl;
+            std::cout << "Bob Wins" << std::endl;
         else
-            std::cout << "Computer" << std::endl;
+            std::cout << "Ana Wins" << std::endl;
         exit(1);
     }else if(jogadas == 9){
         std::cout << "A Tie" << std::endl;
@@ -150,7 +199,7 @@ void minimax(int player, int profundidade, bool adversario, int matrix[3][3]){
     }
     int a = (rand() % 9) + 1;
     int b = 0;
-    for(int i =0; i<pesos.size()*a;i++){
+    for(int i =0; i<(int) pesos.size()*a;i++){
         if(pesos[i%pesos.size()] == max){
             b++;
         }
