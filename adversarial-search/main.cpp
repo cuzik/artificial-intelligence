@@ -49,8 +49,6 @@ void player_player();
 void comp_player();
 void comp_comp();
 
-
-
 int x=0;
 int y=0;
 
@@ -103,7 +101,7 @@ void comp_player(){
         al_clear_to_color(al_map_rgb(0, 0, 0));
         read_keyboard();
         if(player==1){
-            minimax(player,jogadas,false,tabuleiro);
+            comp_move(player,jogadas,false,tabuleiro);
         }
         draw_tab();
         al_flip_display();
@@ -115,14 +113,14 @@ void comp_comp(){
         verifica_fim();
         al_clear_to_color(al_map_rgb(0, 0, 0));
         read_keyboard();
-        minimax(player,jogadas,false,tabuleiro);
+        comp_move(player,jogadas,false,tabuleiro);
         draw_tab();
         al_flip_display();
     }
 }
 
 void comp_move(int player, int profundidade, bool adversario, int matrix[3][3]){
-
+    minimax(player,jogadas,false,tabuleiro);
 }
 
 void verifica_fim(){
@@ -219,7 +217,6 @@ int min_max(int player, int profundidade, bool adversario, int matrix[3][3]){
     int max = -10000;
     int aux = 0;
     if(verifica_vencedor(matrix)!=0 || profundidade==9){
-        // std::cout << profundidade + (verifica_vencedor(matrix) * 10 * player) << std::endl;
         return profundidade + (verifica_vencedor(matrix) * 10 * player);
     }
     if(adversario){
