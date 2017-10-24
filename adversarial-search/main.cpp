@@ -48,6 +48,8 @@ int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
 int x=0;
 int y=0;
 
+int expan = 0;
+
 bool run = true;
 
 int player = -1;
@@ -126,6 +128,8 @@ void read_keyboard(){
 
 
 void minimax(int player, int profundidade, bool adversario, int matrix[3][3]){
+    expan = 0;
+    
     std::vector< Ponto > ponto;
     std::vector<int> pesos;
     int aux,max=-10000;
@@ -156,12 +160,14 @@ void minimax(int player, int profundidade, bool adversario, int matrix[3][3]){
             tabuleiro[ponto[i%pesos.size()].x][ponto[i%pesos.size()].y] = player;
             jogadas++;
             troca_jogador();
+            std::cout << "Nós exp: " << expan << std::endl;
             return;
         }
     }
 }
 
 int min_max(int player, int profundidade, bool adversario, int matrix[3][3]){
+    expan++;
     int min = 10000;
     int max = -10000;
     int aux = 0;
