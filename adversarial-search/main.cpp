@@ -12,7 +12,7 @@
 #include <vector>
 #include <cmath>
 
-int TAM_CELULA = 70;
+int TAM_CELULA = 150;
 int TAM_BORDA = 15;
 int x_Dimension = 3;
 int y_Dimension = 3;
@@ -88,7 +88,7 @@ int main(int argc, char const *argv[]){
 void player_player(){
     while(run){
         verifica_fim();
-        al_clear_to_color(al_map_rgb(0, 0, 0));
+        al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
         draw_tab();
         al_flip_display();
@@ -98,7 +98,7 @@ void player_player(){
 void comp_player(){
     while(run){
         verifica_fim();
-        al_clear_to_color(al_map_rgb(0, 0, 0));
+        al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
         if(player==1){
             comp_move(player,jogadas,false,tabuleiro);
@@ -111,7 +111,7 @@ void comp_player(){
 void comp_comp(){
     while(run){
         verifica_fim();
-        al_clear_to_color(al_map_rgb(0, 0, 0));
+        al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
         comp_move(player,jogadas,false,tabuleiro);
         draw_tab();
@@ -264,23 +264,36 @@ bool marca_player(int pos_x, int pos_y){
 void draw_tab(){
     for(int i=0;i<x_Dimension;i++){
         for(int j=0;j<y_Dimension;j++){
-            if(i==x && j==y){
-                al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(0, 0, 255));
-                // al_draw_filled_circle(TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(color[matrix[i][j]][0], color[matrix[i][j]][1], color[matrix[i][j]][2]));
+            
+            if((i+j) % 2 == 0){
+                al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(204, 199, 199));
             }
+            
             if(tabuleiro[i][j]==1){
-                // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(0, 255, 0), 2.0);
-                al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(0, 255, 0));
+                // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(213, 219, 37), 2.0);
+                al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(213, 219, 37));
             }else if(tabuleiro[i][j]==-1){
-                // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(255, 0, 0), 2.0);
-                al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(255, 0, 0));
+                // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(4, 84, 137), 2.0);
+                al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(4, 84, 137));
+            }
+
+            if(i==x && j==y){
+                if(tabuleiro[i][j]!=0){
+                    // al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(244, 95, 95),6.0);
+                    // al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(244, 95, 95));
+                    al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(244, 95, 95), 6.0);
+                }else{
+                    // al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(11, 132, 32),6.0);
+                    // al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(11, 132, 32));
+                    al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(11, 132, 32), 6.0);
+                }
             }
         }
     }
     if(player == -1){
-        al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tBob",jogadas);
+        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "jogadas: %i Player: \tBob",jogadas);
     }else{
-        al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tAna",jogadas);
+        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "jogadas: %i Player: \tAna",jogadas);
     }
 }
 
