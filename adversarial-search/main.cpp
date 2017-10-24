@@ -48,9 +48,6 @@ int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
 int x=0;
 int y=0;
 
-int next_x = 0;
-int next_y = 0;
-
 bool run = true;
 
 int player = -1;
@@ -63,19 +60,17 @@ int main(int argc, char const *argv[]){
     while(run){
         verifica_fim();
         al_clear_to_color(al_map_rgb(0, 0, 0));
+        read_keyboard();
         if(player == -1){
-            al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tPlayer",jogadas);
-            read_keyboard();
+            al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tBob",jogadas);
+            // minimax(player,jogadas,false,tabuleiro);
         }else{
-            al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tComputer",jogadas);
+            al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tAna",jogadas);
             minimax(player,jogadas,false,tabuleiro);
-            tabuleiro[next_x][next_y] = player;
-            jogadas++;
-            troca_jogador();
         }
 
         draw_tab();
-        // usleep(3000000);
+        // usleep(500000);
         al_flip_display();
     }
     return 0;
@@ -158,8 +153,9 @@ void minimax(int player, int profundidade, bool adversario, int matrix[3][3]){
             b++;
         }
         if(a==b){
-            next_x = ponto[i%pesos.size()].x;
-            next_y = ponto[i%pesos.size()].y;
+            tabuleiro[ponto[i%pesos.size()].x][ponto[i%pesos.size()].y] = player;
+            jogadas++;
+            troca_jogador();
             return;
         }
     }
