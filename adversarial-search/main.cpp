@@ -33,9 +33,14 @@ int verifica_vencedor(int matriz[3][3]);
 void verifica_fim();
 
 
+typedef struct ${
+    int x;
+    int y;
+} Ponto;
+
 
 int min_max(int player, int profundidade, bool adversario, int matrix[3][3]);
-
+void minimax(int player, int profundidade, bool adversario, int matrix[3][3]);
 
 
 int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
@@ -63,7 +68,7 @@ int main(int argc, char const *argv[]){
             read_keyboard();
         }else{
             al_draw_textf(fonte, al_map_rgb(255, 255, 0), 10 , 0, 0, "jogadas: %i \tComputer",jogadas);
-            min_max(player,jogadas,false,tabuleiro);
+            minimax(player,jogadas,false,tabuleiro);
             tabuleiro[next_x][next_y] = player;
             jogadas++;
             troca_jogador();
@@ -124,6 +129,42 @@ void read_keyboard(){
     }
 }
 
+
+void minimax(int player, int profundidade, bool adversario, int matrix[3][3]){
+    std::vector< Ponto > ponto;
+    std::vector<int> pesos;
+    int aux,max=-10000;
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            if(matrix[i][j]==0){
+                matrix[i][j]=player;
+                aux = min_max(player,profundidade+1,true,matrix);
+                matrix[i][j]=0;
+                if(max < aux){
+                    max = aux;
+                }
+                Ponto ponto_aux;
+                ponto_aux.x = i;
+                ponto_aux.y = j;
+                ponto.push_back(ponto_aux);
+                pesos.push_back(aux);
+            }
+        }
+    }
+    int a = (rand() % 9) + 1;
+    int b = 0;
+    for(int i =0; i<pesos.size()*a;i++){
+        if(pesos[i%pesos.size()] == max){
+            b++;
+        }
+        if(a==b){
+            next_x = ponto[i%pesos.size()].x;
+            next_y = ponto[i%pesos.size()].y;
+            return;
+        }
+    }
+}
+
 int min_max(int player, int profundidade, bool adversario, int matrix[3][3]){
     int min = 10000;
     int max = -10000;
@@ -141,8 +182,6 @@ int min_max(int player, int profundidade, bool adversario, int matrix[3][3]){
                     matrix[i][j]=0;
                     if(min > aux){
                         min = aux;
-                        next_x = i;
-                        next_y = j;
                     }
                 }
             }
@@ -157,8 +196,6 @@ int min_max(int player, int profundidade, bool adversario, int matrix[3][3]){
                     matrix[i][j]=0;
                     if(max < aux){
                         max = aux;
-                        next_x = i;
-                        next_y = j;
                     }
                 }
             }
