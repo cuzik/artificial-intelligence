@@ -105,7 +105,7 @@ void player_player(){
         verifica_fim();
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
@@ -119,7 +119,7 @@ void comp_player(){
             comp_move();
         }
         read_keyboard();
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
@@ -131,7 +131,7 @@ void comp_comp(){
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
         comp_move();
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
