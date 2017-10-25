@@ -105,7 +105,7 @@ void player_player(){
         verifica_fim();
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
-        draw_tab_bob();
+        draw_tab();
         al_flip_display();
     }
 }
@@ -119,7 +119,7 @@ void comp_player(){
             comp_move();
         }
         read_keyboard();
-        draw_tab_bob();
+        draw_tab();
         al_flip_display();
     }
 }
@@ -131,7 +131,7 @@ void comp_comp(){
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
         comp_move();
-        draw_tab_bob();
+        draw_tab();
         al_flip_display();
     }
 }
@@ -385,13 +385,13 @@ void draw_tab(){
 
             if(i==x && j==y){
                 if(tabuleiro[i][j]!=0){
-                    // al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(244, 95, 95),6.0);
+                    al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(244, 95, 95),6.0);
                     // al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(244, 95, 95));
-                    al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(244, 95, 95), 6.0);
+                    // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(244, 95, 95), 6.0);
                 }else{
-                    // al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(11, 132, 32),6.0);
+                    al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(11, 132, 32),6.0);
                     // al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(11, 132, 32));
-                    al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(11, 132, 32), 6.0);
+                    // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(11, 132, 32), 6.0);
                 }
             }
         }
@@ -419,9 +419,11 @@ void draw_tab_bob(){
 
             if(i==x && j==y){
                 if(tabuleiro[i][j]!=0){
-                    al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(244, 95, 95), 6.0);
+                    al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(244, 95, 95),6.0);
+                    // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(244, 95, 95), 6.0);
                 }else{
-                    al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(11, 132, 32), 6.0);
+                    al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(11, 132, 32),6.0);
+                    // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(11, 132, 32), 6.0);
                 }
             }
         }
