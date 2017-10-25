@@ -2,6 +2,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_image.h>
 #include <pthread.h>
 
 #include <iostream>
@@ -23,9 +24,12 @@ int ALTURA_TELA = y_Dimension * TAM_CELULA + 2 * TAM_BORDA;
 ALLEGRO_DISPLAY *janela = NULL;
 ALLEGRO_EVENT_QUEUE *fila_eventos = NULL;
 ALLEGRO_FONT *fonte = NULL;
+ALLEGRO_BITMAP *player_1 = NULL;
+ALLEGRO_BITMAP *player_2 = NULL;
 
 bool inicializar();
 void draw_tab();
+void draw_tab_bob();
 void read_keyboard();
 bool marca_player(int pos_x, int pos_y);
 void troca_jogador();
@@ -90,7 +94,7 @@ void player_player(){
         verifica_fim();
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
@@ -103,7 +107,7 @@ void comp_player(){
         if(player==1){
             comp_move(player,jogadas,false,tabuleiro);
         }
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
@@ -114,7 +118,7 @@ void comp_comp(){
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
         comp_move(player,jogadas,false,tabuleiro);
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
@@ -297,6 +301,36 @@ void draw_tab(){
     }
 }
 
+void draw_tab_bob(){
+    for(int i=0;i<x_Dimension;i++){
+        for(int j=0;j<y_Dimension;j++){
+            
+            if((i+j) % 2 == 0){
+                al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(204, 199, 199));
+            }
+            
+            if(tabuleiro[i][j]==1){
+                al_draw_bitmap(player_1, TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA), 0);
+            }else if(tabuleiro[i][j]==-1){
+                al_draw_bitmap(player_2, TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA), 0);
+            }
+
+            if(i==x && j==y){
+                if(tabuleiro[i][j]!=0){
+                    al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(244, 95, 95), 6.0);
+                }else{
+                    al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(11, 132, 32), 6.0);
+                }
+            }
+        }
+    }
+    if(player == -1){
+        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "jogadas: %i Player: \tBob",jogadas);
+    }else{
+        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "jogadas: %i Player: \tAna",jogadas);
+    }
+}
+
 int verifica_vencedor(int matriz[3][3]){
     for(int i=0;i<3;i++){
         if((matriz[i][0] + matriz[i][1] + matriz[i][2]) == 3
@@ -333,6 +367,10 @@ bool inicializar(){
     }
 
     al_init_font_addon();
+    al_init_image_addon();
+
+    player_1 = al_load_bitmap("image/gre_1.jpg");
+    player_2 = al_load_bitmap("image/gre_2.jpg");
 
     if (!al_init_ttf_addon()){
         fprintf(stderr, "Falha ao inicializar allegro_ttf.\n");
