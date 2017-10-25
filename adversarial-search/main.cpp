@@ -45,7 +45,11 @@ typedef struct ${
 
 int min_max(int player, int profundidade, bool adversario, int matrix[3][3]);
 void minimax(int player, int profundidade, bool adversario, int matrix[3][3]);
-void comp_move(int player, int profundidade, bool adversario, int matrix[3][3]);
+
+int alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], int alpha, int beta);
+void poda_alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], int alpha, int beta);
+
+void comp_move();
 
 int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
 
@@ -63,15 +67,21 @@ int jogadas = 0;
 int mode;
 int alg;
 
+int frames = 0;
+
 int main(int argc, char const *argv[]){
-    srand( (unsigned)time(NULL) );
-    inicializar();
     if(argc<3){
-        std::cout << "Ta faltando paremetro ai brow\n tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MimiMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
+        std::cout << "Ta faltando paremetro ai brother\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MimiMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
         return 0;
     }
     mode = atoi(argv[1]);
     alg = atoi(argv[2]);
+    if(mode < 0 || mode > 3 || alg < 0 || alg > 3){
+        std::cout << "Tem paremetro errado ai parça\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MimiMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
+        return 0;
+    }
+    srand( (unsigned)time(NULL) );
+    inicializar();
     switch(mode){
         case 0:
             player_player();
@@ -91,40 +101,54 @@ int main(int argc, char const *argv[]){
 
 void player_player(){
     while(run){
+        frames++;
         verifica_fim();
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
-        draw_tab_bob();
+        draw_tab();
         al_flip_display();
     }
 }
 
 void comp_player(){
     while(run){
+        frames++;
         verifica_fim();
         al_clear_to_color(al_map_rgb(239, 230, 230));
-        read_keyboard();
         if(player==1){
-            comp_move(player,jogadas,false,tabuleiro);
+            comp_move();
         }
-        draw_tab_bob();
+        read_keyboard();
+        draw_tab();
         al_flip_display();
     }
 }
 
 void comp_comp(){
     while(run){
+        frames++;
         verifica_fim();
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
-        comp_move(player,jogadas,false,tabuleiro);
-        draw_tab_bob();
+        comp_move();
+        draw_tab();
         al_flip_display();
     }
 }
 
-void comp_move(int player, int profundidade, bool adversario, int matrix[3][3]){
-    minimax(player,jogadas,false,tabuleiro);
+void comp_move(){
+    // usleep(500000);
+    switch(alg){
+        case 0:
+            minimax(player,jogadas,false,tabuleiro);
+            break;
+        case 1:
+            poda_alpha_beta(player,jogadas,false,tabuleiro,-100000,100000);
+            break;
+        case 2:
+            // neural_network(player,tabuleiro);
+            break;
+    }
 }
 
 void verifica_fim(){
@@ -254,6 +278,84 @@ int min_max(int player, int profundidade, bool adversario, int matrix[3][3]){
     }
 }
 
+void poda_alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], int alpha, int beta){
+    expan = 0;
+    
+    std::vector< Ponto > ponto;
+    std::vector<int> pesos;
+    int aux,max=-10000;
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            if(matrix[i][j]==0){
+                matrix[i][j]=player;
+                aux = alpha_beta(player,profundidade+1,true,matrix,alpha,beta);
+                matrix[i][j]=0;
+                if(max < aux){
+                    max = aux;
+                }
+                Ponto ponto_aux;
+                ponto_aux.x = i;
+                ponto_aux.y = j;
+                ponto.push_back(ponto_aux);
+                pesos.push_back(aux);
+            }
+        }
+    }
+    int a = (rand() % 9) + 1;
+    int b = 0;
+    for(int i =0; i<(int) pesos.size()*a;i++){
+        if(pesos[i%pesos.size()] == max){
+            b++;
+        }
+        if(a==b){
+            tabuleiro[ponto[i%pesos.size()].x][ponto[i%pesos.size()].y] = player;
+            jogadas++;
+            troca_jogador();
+            std::cout << "Nós exp: " << expan << std::endl;
+            return;
+        }
+    }
+}
+
+int alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], int alpha, int beta){
+    expan++;
+    int min = 10000;
+    int max = -10000;
+    int aux = 0;
+    if(verifica_vencedor(matrix)!=0 || profundidade==9){
+        return profundidade + (verifica_vencedor(matrix) * 10 * player);
+    }
+    if(adversario){
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                if(matrix[i][j]==0){
+                    matrix[i][j]=-player;
+                    aux = alpha_beta(player,profundidade+1,false,matrix,alpha,beta);
+                    matrix[i][j]=0;
+                    if(min > aux){
+                        min = aux;
+                    }
+                }
+            }
+        }
+        return min;
+    }else{
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                if(matrix[i][j]==0){
+                    matrix[i][j]=player;
+                    aux = alpha_beta(player,profundidade+1,true,matrix,alpha,beta);
+                    matrix[i][j]=0;
+                    if(max < aux){
+                        max = aux;
+                    }
+                }
+            }
+        }
+        return max;
+    }
+}
+
 void troca_jogador(){
     player = -player;
 }
@@ -295,9 +397,9 @@ void draw_tab(){
         }
     }
     if(player == -1){
-        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "jogadas: %i Player: \tBob",jogadas);
+        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "Frames: %i \tJogadas: %i \tPlayer: Bob",frames,jogadas);
     }else{
-        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "jogadas: %i Player: \tAna",jogadas);
+        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "Frames: %i \tJogadas: %i \tPlayer: Ana",frames,jogadas);
     }
 }
 
@@ -325,38 +427,29 @@ void draw_tab_bob(){
         }
     }
     if(player == -1){
-        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "jogadas: %i Player: \tBob",jogadas);
+        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "Frames: %i \tJogadas: %i \tPlayer: Bob",frames,jogadas);
     }else{
-        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "jogadas: %i Player: \tAna",jogadas);
+        al_draw_textf(fonte, al_map_rgb(0, 0, 0), 10 , 0, 0, "Frames: %i \tJogadas: %i \tPlayer: Ana",frames,jogadas);
     }
 }
 
 int verifica_vencedor(int matriz[3][3]){
     for(int i=0;i<3;i++){
-        if((matriz[i][0] + matriz[i][1] + matriz[i][2]) == 3
-        || (matriz[0][i] + matriz[1][i] + matriz[2][i]) == 3){
-            // std::cout << "1" << std::endl;
+        if((matriz[i][0] + matriz[i][1] + matriz[i][2]) == 3 || (matriz[0][i] + matriz[1][i] + matriz[2][i]) == 3){
             return 1;
         }
     }
-    if((matriz[0][0] + matriz[1][1] + matriz[2][2]) == 3
-    || (matriz[2][0] + matriz[1][1] + matriz[0][2]) == 3){
-        // std::cout << "1" << std::endl;
+    if((matriz[0][0] + matriz[1][1] + matriz[2][2]) == 3 || (matriz[2][0] + matriz[1][1] + matriz[0][2]) == 3){
         return 1;
     }
     for(int i=0;i<3;i++){
-        if((matriz[i][0] + matriz[i][1] + matriz[i][2]) == -3
-        || (matriz[0][i] + matriz[1][i] + matriz[2][i]) == -3){
-            // std::cout << "-1" << std::endl;
+        if((matriz[i][0] + matriz[i][1] + matriz[i][2]) == -3 || (matriz[0][i] + matriz[1][i] + matriz[2][i]) == -3){
             return -1;
         }
     }
-    if((matriz[0][0] + matriz[1][1] + matriz[2][2]) == -3
-    || (matriz[2][0] + matriz[1][1] + matriz[0][2]) == -3){
-        // std::cout << "-1" << std::endl;
+    if((matriz[0][0] + matriz[1][1] + matriz[2][2]) == -3 || (matriz[2][0] + matriz[1][1] + matriz[0][2]) == -3){
         return -1;
     }
-    // std::cout << "0" << std::endl;
     return 0;
 }
 
