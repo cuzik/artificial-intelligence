@@ -27,6 +27,6 @@
 
 - (0) MimiMax
 
-- (1) Alpha-Beta
+- (1) Alpha-Beta Pruning
 
 - (2) Neural-Network

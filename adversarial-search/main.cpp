@@ -1,83 +1,76 @@
+// Bibliotecas GUI
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
-#include <pthread.h>
 
+// Bibliotecas do sistema
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <unistd.h>
 #include <vector>
-#include <cmath>
 
+// Variaveis Fixas
 int TAM_CELULA = 150;
 int TAM_BORDA = 15;
 int x_Dimension = 3;
 int y_Dimension = 3;
-
 int LARGURA_TELA = x_Dimension * TAM_CELULA + 2 * TAM_BORDA;
 int ALTURA_TELA = y_Dimension * TAM_CELULA + 2 * TAM_BORDA;
 
+// Variaveis da GUI
 ALLEGRO_DISPLAY *janela = NULL;
 ALLEGRO_EVENT_QUEUE *fila_eventos = NULL;
 ALLEGRO_FONT *fonte = NULL;
 ALLEGRO_BITMAP *player_1 = NULL;
 ALLEGRO_BITMAP *player_2 = NULL;
 
-bool inicializar();
-void draw_tab();
-void draw_tab_bob();
-void read_keyboard();
-bool marca_player(int pos_x, int pos_y);
-void troca_jogador();
-int verifica_vencedor(int matriz[3][3]);
-void verifica_fim();
-
-
+//
 typedef struct ${
     int x;
     int y;
 } Ponto;
 
+// Funções com GUI
+bool inicializar();
+void draw_tab();
+void draw_tab_bob();
+void read_keyboard();
 
+// Funções do Jogo
+bool marca_player(int pos_x, int pos_y);
+void troca_jogador();
+int verifica_vencedor(int matriz[3][3]);
+void verifica_fim();
 int min_max(int player, int profundidade, bool adversario, int matrix[3][3]);
 void minimax(int player, int profundidade, bool adversario, int matrix[3][3]);
-
 int alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], int alpha, int beta);
 void poda_alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], int alpha, int beta);
-
 void comp_move();
-
-int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
-
 void player_player();
 void comp_player();
 void comp_comp();
 
+// Variaives do Jogo
+int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
 int x=0;
 int y=0;
-
 bool run = true;
 int expan = 0;
 int player = -1;
 int jogadas = 0;
 int mode;
 int alg;
-
 int frames = 0;
 
 int main(int argc, char const *argv[]){
     if(argc<3){
-        std::cout << "Ta faltando paremetro ai brother\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MimiMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
+        std::cout << "Ta faltando paremetro ai brother\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MiniMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
         return 0;
     }
     mode = atoi(argv[1]);
     alg = atoi(argv[2]);
     if(mode < 0 || mode > 3 || alg < 0 || alg > 3){
-        std::cout << "Tem paremetro errado ai parça\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MimiMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
+        std::cout << "Tem paremetro errado ai parça\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MiniMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
         return 0;
     }
     srand( (unsigned)time(NULL) );
@@ -105,7 +98,7 @@ void player_player(){
         verifica_fim();
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
@@ -119,7 +112,7 @@ void comp_player(){
             comp_move();
         }
         read_keyboard();
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
@@ -131,7 +124,7 @@ void comp_comp(){
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
         comp_move();
-        draw_tab();
+        draw_tab_bob();
         al_flip_display();
     }
 }
@@ -202,7 +195,7 @@ void read_keyboard(){
 
 void minimax(int player, int profundidade, bool adversario, int matrix[3][3]){
     expan = 0;
-    
+
     std::vector< Ponto > ponto;
     std::vector<int> pesos;
     int aux,max=-10000;
@@ -280,7 +273,7 @@ int min_max(int player, int profundidade, bool adversario, int matrix[3][3]){
 
 void poda_alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], int alpha, int beta){
     expan = 0;
-    
+
     std::vector< Ponto > ponto;
     std::vector<int> pesos;
     int aux,max=-10000;
@@ -330,10 +323,13 @@ int alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], 
             for(int j=0;j<3;j++){
                 if(matrix[i][j]==0){
                     matrix[i][j]=-player;
-                    aux = alpha_beta(player,profundidade+1,false,matrix,alpha,beta);
+                    beta = alpha_beta(player,profundidade+1,false,matrix,alpha,beta);
                     matrix[i][j]=0;
-                    if(min > aux){
-                        min = aux;
+                    if(min > beta){
+                        min = beta;
+                    }
+                    if(beta <= alpha){
+                        return min;
                     }
                 }
             }
@@ -344,10 +340,13 @@ int alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], 
             for(int j=0;j<3;j++){
                 if(matrix[i][j]==0){
                     matrix[i][j]=player;
-                    aux = alpha_beta(player,profundidade+1,true,matrix,alpha,beta);
+                    alpha = alpha_beta(player,profundidade+1,true,matrix,alpha,beta);
                     matrix[i][j]=0;
-                    if(max < aux){
-                        max = aux;
+                    if(max < alpha){
+                        max = alpha;
+                    }
+                    if(alpha >= beta){
+                        return max;
                     }
                 }
             }
@@ -365,16 +364,14 @@ bool marca_player(int pos_x, int pos_y){
         return false;
     tabuleiro[pos_x][pos_y] = player;
     return true;
-} 
+}
 
 void draw_tab(){
     for(int i=0;i<x_Dimension;i++){
         for(int j=0;j<y_Dimension;j++){
-            
             if((i+j) % 2 == 0){
                 al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(204, 199, 199));
             }
-            
             if(tabuleiro[i][j]==1){
                 // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(213, 219, 37), 2.0);
                 al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(213, 219, 37));
@@ -382,7 +379,6 @@ void draw_tab(){
                 // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(4, 84, 137), 2.0);
                 al_draw_filled_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2), al_map_rgb(4, 84, 137));
             }
-
             if(i==x && j==y){
                 if(tabuleiro[i][j]!=0){
                     al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(244, 95, 95),6.0);
@@ -406,24 +402,19 @@ void draw_tab(){
 void draw_tab_bob(){
     for(int i=0;i<x_Dimension;i++){
         for(int j=0;j<y_Dimension;j++){
-            
             if((i+j) % 2 == 0){
                 al_draw_filled_rectangle(TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA),TAM_BORDA+((j+1)*TAM_CELULA), TAM_BORDA+((i+1)*TAM_CELULA), al_map_rgb(204, 199, 199));
             }
-            
             if(tabuleiro[i][j]==1){
                 al_draw_bitmap(player_1, TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA), 0);
             }else if(tabuleiro[i][j]==-1){
                 al_draw_bitmap(player_2, TAM_BORDA+(j*TAM_CELULA), TAM_BORDA+(i*TAM_CELULA), 0);
             }
-
             if(i==x && j==y){
                 if(tabuleiro[i][j]!=0){
                     al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(244, 95, 95),6.0);
-                    // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(244, 95, 95), 6.0);
                 }else{
                     al_draw_rectangle(TAM_BORDA+(j*TAM_CELULA)+3, TAM_BORDA+(i*TAM_CELULA)+3,TAM_BORDA+((j+1)*TAM_CELULA)-3, TAM_BORDA+((i+1)*TAM_CELULA)-3, al_map_rgb(11, 132, 32),6.0);
-                    // al_draw_circle(TAM_BORDA+(j*TAM_CELULA)+(TAM_CELULA/2), TAM_BORDA+(i*TAM_CELULA)+(TAM_CELULA/2), (TAM_CELULA/2)-3, al_map_rgb(11, 132, 32), 6.0);
                 }
             }
         }
