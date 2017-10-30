@@ -49,6 +49,7 @@ void comp_move();
 void player_player();
 void comp_player();
 void comp_comp();
+void minimax_alphabeta();
 
 // Variaives do Jogo
 int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
@@ -64,13 +65,13 @@ int frames = 0;
 
 int main(int argc, char const *argv[]){
     if(argc<3){
-        std::cout << "Ta faltando paremetro ai brother\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MiniMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
+        std::cout << "Ta faltando paremetro ai brother\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n(4) Comp(MiniMax) x Comp(AlphaBeta)\n-> [ALG]: Algorithm\n\n(0) MiniMax\n(1) Alpha-Beta\n" << std::endl;
         return 0;
     }
     mode = atoi(argv[1]);
     alg = atoi(argv[2]);
-    if(mode < 0 || mode > 3 || alg < 0 || alg > 3){
-        std::cout << "Tem paremetro errado ai parça\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n\n-> [ALG]: Algorithm\n\n(0) MiniMax\n(1) Alpha-Beta\n(2) Neural-Network\n" << std::endl;
+    if(mode < 0 || mode > 4 || alg < 0 || alg > 1){
+        std::cout << "Tem paremetro errado ai parça\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n(4) Comp(MiniMax) x Comp(AlphaBeta)\n\n-> [ALG]: Algorithm\n\n(0) MiniMax\n(1) Alpha-Beta\n" << std::endl;
         return 0;
     }
     srand( (unsigned)time(NULL) );
@@ -88,6 +89,9 @@ int main(int argc, char const *argv[]){
             break;
         case 3:
             comp_comp();
+        case 4:
+            minimax_alphabeta();
+            break;
     }
     return 0;
 }
@@ -98,7 +102,7 @@ void player_player(){
         verifica_fim();
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
-        draw_tab_bob();
+        draw_tab();
         al_flip_display();
     }
 }
@@ -112,7 +116,7 @@ void comp_player(){
             comp_move();
         }
         read_keyboard();
-        draw_tab_bob();
+        draw_tab();
         al_flip_display();
     }
 }
@@ -124,23 +128,34 @@ void comp_comp(){
         al_clear_to_color(al_map_rgb(239, 230, 230));
         read_keyboard();
         comp_move();
-        draw_tab_bob();
+        draw_tab();
+        al_flip_display();
+    }
+}
+
+void minimax_alphabeta(){
+    while(run){
+        frames++;
+        verifica_fim();
+        al_clear_to_color(al_map_rgb(239, 230, 230));
+        if(player==-1){
+            minimax(player,jogadas,false,tabuleiro);
+        }else{
+            poda_alpha_beta(player,jogadas,false,tabuleiro,-100000,100000);
+        }
+        read_keyboard();
+        // comp_move();
+        draw_tab();
         al_flip_display();
     }
 }
 
 void comp_move(){
     // usleep(500000);
-    switch(alg){
-        case 0:
-            minimax(player,jogadas,false,tabuleiro);
-            break;
-        case 1:
-            poda_alpha_beta(player,jogadas,false,tabuleiro,-100000,100000);
-            break;
-        case 2:
-            // neural_network(player,tabuleiro);
-            break;
+    if(alg == 0){
+        minimax(player,jogadas,false,tabuleiro);
+    }else{
+        poda_alpha_beta(player,jogadas,false,tabuleiro,-100000,100000);
     }
 }
 
@@ -314,7 +329,6 @@ int alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], 
     expan++;
     int min = 10000;
     int max = -10000;
-    int aux = 0;
     if(verifica_vencedor(matrix)!=0 || profundidade==9){
         return profundidade + (verifica_vencedor(matrix) * 10 * player);
     }
@@ -328,7 +342,7 @@ int alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], 
                     if(min > beta){
                         min = beta;
                     }
-                    if(beta <= alpha){
+                    if(min <= alpha){
                         return min;
                     }
                 }
@@ -345,7 +359,7 @@ int alpha_beta(int player, int profundidade, bool adversario, int matrix[3][3], 
                     if(max < alpha){
                         max = alpha;
                     }
-                    if(alpha >= beta){
+                    if(max >= beta){
                         return max;
                     }
                 }
