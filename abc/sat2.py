@@ -6,8 +6,8 @@ MAX = 100
 MIN = 0
 NUM_BEES = 50
 files_test = [6,20,100,250]
-NUM_VARIABLES = [4, 91, 430, 1065]
 atual_file = 0
+
 
 def read_file(input):
   input = str(input) + ".cnf"
@@ -18,6 +18,8 @@ def read_file(input):
     a = a[:-1]
     data += [a]
   return data
+
+data_ori = read_file(files_test[atual_file])
 
 def rand_True_or_False():
   return randint(0,2) == 1
@@ -57,13 +59,12 @@ def fitness(mirror):
 
 
 def obj_fun(bee):
-  return fitness(bee)
+  return fitness(mirror_bin(data_ori,bee))
 
 def new_spot(variables_number, min, max):
-  data_ori = read_file(files_test[atual_file])
-  values   = hash_bin(files_test[atual_file])
-  mirror = mirror_bin(data_ori,values)
-  return mirror
+  values = hash_bin(files_test[atual_file])
+  return values
+
 
 def population_init(variables_number, population_zise):
   data = []
@@ -128,7 +129,7 @@ def patter_spot(roulette):
 def switch_to_scout(onlookers, employeds, nectar_spots):
   for i in onlookers:
     if nectar_spots[i] <= 0:
-      employeds[i] = new_spot(NUM_VARIABLES[atual_file],MIN,MAX)
+      employeds[i] = new_spot(files_test[atual_file],MIN,MAX)
       nectar_spots[i] = 5
   return (employeds, nectar_spots)
 
@@ -144,12 +145,13 @@ def find_best(employeds, best_solution, interacoes):
   if switch:
     print('<',end='')
     print('%7i' % interacoes,end='')
-    print(' => %7i' % obj_fun(best_solution))
+    print(' => ',end='')
+    print('%11.7f' % obj_fun(best_solution))
   return best_solution
 
 def dance(employeds, nectar_spots):
   for i in range(0,len(employeds)):
-    j = randint(0,NUM_VARIABLES[atual_file]-1)
+    j = randint(0,files_test[atual_file]-1)
     k = randint(0,len(employeds)-1)
     while k == i:
       k = randint(0,len(employeds)-1)
@@ -159,26 +161,24 @@ def dance(employeds, nectar_spots):
   return (employeds, nectar_spots)
 
 def copy_bee(bee):
-  copy = []
-  for i in bee:
-    copy += [i]
+  copy = bee.copy()
   return copy
 
 def near_spot(bee_base, j, bee_aux):
   new_bee = copy_bee(bee_base)
-  new_bee[j] = bee_aux[j]
+  new_bee[j+1] = bee_aux[j+1]
   if obj_fun(new_bee) < obj_fun(bee_base):
     return (new_bee, True)
   return (bee_base, False)
 
 def main():
   onlookers = []
-  best_solution = new_spot(NUM_VARIABLES[atual_file],MIN,MAX)
+  best_solution = new_spot(files_test[atual_file],MIN,MAX)
 
   #Inicialize a população;
-  employeds = population_init(NUM_VARIABLES[atual_file],int(NUM_BEES/2));
+  employeds = population_init(files_test[atual_file],int(NUM_BEES/2));
   nectar_spots = [6 for i in range(0,len(employeds))]
-  for i in range(0,5000):
+  for i in range(0,500):
     #Posicione as abelhas campeiras em suas fontes de alimento;
     (employeds, nectar_spots) = dance(employeds, nectar_spots)
 
