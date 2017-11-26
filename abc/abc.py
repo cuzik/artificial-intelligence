@@ -86,6 +86,13 @@ def switch_to_scout(onlookers, employeds, nectar_spots):
       nectar_spots[i] = 5
   return (employeds, nectar_spots)
 
+def switch_to_scout2(onlookers, employeds, nectar_spots):
+  for i in range(0,len(employeds)):
+    if nectar_spots[i] <= 0:
+      employeds[i] = new_spot(NUM_VARIABLES,MIN,MAX)
+      nectar_spots[i] = 5
+  return (employeds, nectar_spots)
+
 def find_best(employeds, best_solution):
   best_value = obj_fun(best_solution)
   for bee in employeds:
@@ -93,6 +100,7 @@ def find_best(employeds, best_solution):
     if atual < best_value:
       best_value = atual
       best_solution = bee
+      print(obj_fun(best_solution))
   return best_solution
 
 def dance(employeds, nectar_spots):
@@ -143,7 +151,7 @@ def main():
     onlookers = position_select(roulette)
 
     #Envie abelhas exploradoras para buscar novas fontes de alimento;
-    (employeds, nectar_spots) = switch_to_scout(onlookers, employeds, nectar_spots)
+    (employeds, nectar_spots) = switch_to_scout2(onlookers, employeds, nectar_spots)
 
     #Memorize a melhor fonte de alimento encontrada até o momento;
     best_solution = find_best(employeds, best_solution)
