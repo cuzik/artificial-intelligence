@@ -1,4 +1,5 @@
 import math
+import locale
 from random import *
 
 NUM_VARIABLES = 4
@@ -93,15 +94,28 @@ def switch_to_scout2(onlookers, employeds, nectar_spots):
       nectar_spots[i] = 5
   return (employeds, nectar_spots)
 
-def find_best(employeds, best_solution):
+def find_best(employeds, best_solution, interacoes):
   best_value = obj_fun(best_solution)
+  switch = False
   for bee in employeds:
     atual = obj_fun(bee)
     if atual < best_value:
+      switch = True
       best_value = atual
       best_solution = bee
-      print(obj_fun(best_solution))
+  if switch:
+    print('<',end='')
+    print('%5i' % interacoes,end='')
+    print('> ' + print_v(best_solution) + ' => ',end='')
+    print('%11.7f' % obj_fun(best_solution))
   return best_solution
+
+def print_v(vector):
+  res = '['
+  for i in range(0,len(vector)-1):
+    res += '%11.7f' % vector[i] + ','
+  res += '%11.7f' % vector[-1] + ']'
+  return res
 
 def dance(employeds, nectar_spots):
   for i in range(0,len(employeds)):
@@ -137,7 +151,7 @@ def main():
   #Inicialize a população;
   employeds = population_init(NUM_VARIABLES,int(NUM_BEES/2));
   nectar_spots = [6 for i in range(0,len(employeds))]
-  for i in range(0,5000):
+  for i in range(0,50000):
     #Posicione as abelhas campeiras em suas fontes de alimento;
     (employeds, nectar_spots) = dance(employeds, nectar_spots)
 
@@ -151,10 +165,10 @@ def main():
     onlookers = position_select(roulette)
 
     #Envie abelhas exploradoras para buscar novas fontes de alimento;
-    (employeds, nectar_spots) = switch_to_scout2(onlookers, employeds, nectar_spots)
+    (employeds, nectar_spots) = switch_to_scout(onlookers, employeds, nectar_spots)
 
     #Memorize a melhor fonte de alimento encontrada até o momento;
-    best_solution = find_best(employeds, best_solution)
+    best_solution = find_best(employeds, best_solution, i)
 
     # print(obj_fun(best_solution))
   print(best_solution)
