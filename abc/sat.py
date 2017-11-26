@@ -2,23 +2,68 @@ import math
 import locale
 from random import *
 
-NUM_VARIABLES = 4
 MAX = 100
 MIN = 0
 NUM_BEES = 50
+files_test = [6,20,100,250]
+NUM_VARIABLES = [4, 91, 430, 1065]
+atual_file = 1
 
-def obj_fun(bee):
-  res = 0
-  weights = [1.1,4.3,2.4,1.1,7.4,3,6,5,8,9,4,6,8,24,6,7,2,3,5]
-  for i in range(0,len(bee)):
-    res += weights[i]*bee[i]
+def read_file(input):
+  input = str(input) + ".cnf"
+  file = open(input)
+  data = []
+  for i in file:
+    a = i.split(" ")
+    a = a[:-1]
+    data += [a]
+  return data
+
+def rand_True_or_False():
+  return randint(0,2) == 1
+
+def hash_bin(number):
+  res = {}
+  for i in range(1,number+1):
+    res.update({i : rand_True_or_False()})
   return res
 
+def attr_value(id, value):
+  if id < 0:
+    return not value
+  return value
+
+def mirror_bin(data,values):
+  mirror = []
+  for i in data:
+    mirror_aux = []
+    for j in i:
+      mirror_aux += [attr_value(int(j), values[abs(int(j))])]
+    mirror += [mirror_aux]
+  return mirror
+
+def point_clausula(clausula):
+  if clausula[0] or clausula[1] or clausula[2]:
+    return 1
+  return 0
+
+def fitness(mirror):
+  fit = 0
+  for i in mirror:
+    fit += point_clausula(i)
+  return fit
+
+
+
+
+def obj_fun(bee):
+  return fitness(bee)
+
 def new_spot(variables_number, min, max):
-  data = []
-  for i in range(0,variables_number):
-    data += [min + uniform(0,1) * (max-min)]
-  return data
+  data_ori = read_file(files_test[atual_file])
+  values   = hash_bin(files_test[atual_file])
+  mirror = mirror_bin(data_ori,values)
+  return mirror
 
 def population_init(variables_number, population_zise):
   data = []
@@ -83,7 +128,7 @@ def patter_spot(roulette):
 def switch_to_scout(onlookers, employeds, nectar_spots):
   for i in onlookers:
     if nectar_spots[i] <= 0:
-      employeds[i] = new_spot(NUM_VARIABLES,MIN,MAX)
+      employeds[i] = new_spot(NUM_VARIABLES[atual_file],MIN,MAX)
       nectar_spots[i] = 5
   return (employeds, nectar_spots)
 
@@ -92,27 +137,15 @@ def find_best(employeds, best_solution, interacoes):
   switch = False
   for bee in employeds:
     atual = obj_fun(bee)
-    if atual < best_value:
+    if atual > best_value:
       switch = True
       best_value = atual
       best_solution = bee
-  if switch:
-    print('<',end='')
-    print('%7i' % interacoes,end='')
-    print('> ' + print_v(best_solution) + ' => ',end='')
-    print('%11.7f' % obj_fun(best_solution))
   return best_solution
-
-def print_v(vector):
-  res = '['
-  for i in range(0,len(vector)-1):
-    res += '%11.7f' % vector[i] + ','
-  res += '%11.7f' % vector[-1] + ']'
-  return res
 
 def dance(employeds, nectar_spots):
   for i in range(0,len(employeds)):
-    j = randint(0,NUM_VARIABLES-1)
+    j = randint(0,NUM_VARIABLES[atual_file]-1)
     k = randint(0,len(employeds)-1)
     while k == i:
       k = randint(0,len(employeds)-1)
@@ -129,22 +162,19 @@ def copy_bee(bee):
 
 def near_spot(bee_base, j, bee_aux):
   new_bee = copy_bee(bee_base)
-  new_value = bee_base[j] + uniform(-1,1)*(bee_base[j] - bee_aux[j])
-  while new_value < MIN or new_value > MAX:
-    new_value = bee_base[j] + uniform(-1,1)*(bee_base[j] - bee_aux[j])
-  new_bee[j] = new_value
+  new_bee[j] = bee_aux[j]
   if obj_fun(new_bee) < obj_fun(bee_base):
     return (new_bee, True)
   return (bee_base, False)
 
 def main():
   onlookers = []
-  best_solution = new_spot(NUM_VARIABLES,MIN,MAX)
+  best_solution = new_spot(NUM_VARIABLES[atual_file],MIN,MAX)
 
   #Inicialize a população;
-  employeds = population_init(NUM_VARIABLES,int(NUM_BEES/2));
+  employeds = population_init(NUM_VARIABLES[atual_file],int(NUM_BEES/2));
   nectar_spots = [6 for i in range(0,len(employeds))]
-  for i in range(0,5000000):
+  for i in range(0,500):
     #Posicione as abelhas campeiras em suas fontes de alimento;
     (employeds, nectar_spots) = dance(employeds, nectar_spots)
 
