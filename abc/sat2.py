@@ -2,11 +2,12 @@ import math
 import locale
 from random import *
 
-MAX = 100
+MAX = 1
 MIN = 0
-NUM_BEES = 50
+NUM_BEES = 10
 files_test = [6,20,100,250]
-atual_file = 0
+atual_file = 1
+loops = 50000
 
 
 def read_file(input):
@@ -138,7 +139,7 @@ def find_best(employeds, best_solution, interacoes):
   switch = False
   for bee in employeds:
     atual = obj_fun(bee)
-    if atual > best_value:
+    if atual >= best_value:
       switch = True
       best_value = atual
       best_solution = bee
@@ -146,7 +147,7 @@ def find_best(employeds, best_solution, interacoes):
     print('<',end='')
     print('%7i' % interacoes,end='')
     print(' => ',end='')
-    print('%11.7f' % obj_fun(best_solution))
+    print('%7i' % obj_fun(best_solution))
   return best_solution
 
 def dance(employeds, nectar_spots):
@@ -178,7 +179,7 @@ def main():
   #Inicialize a população;
   employeds = population_init(files_test[atual_file],int(NUM_BEES/2));
   nectar_spots = [6 for i in range(0,len(employeds))]
-  for i in range(0,500):
+  for i in range(0,loops):
     #Posicione as abelhas campeiras em suas fontes de alimento;
     (employeds, nectar_spots) = dance(employeds, nectar_spots)
 
