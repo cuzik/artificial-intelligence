@@ -87,13 +87,6 @@ def switch_to_scout(onlookers, employeds, nectar_spots):
       nectar_spots[i] = 5
   return (employeds, nectar_spots)
 
-def switch_to_scout2(onlookers, employeds, nectar_spots):
-  for i in range(0,len(employeds)):
-    if nectar_spots[i] <= 0:
-      employeds[i] = new_spot(NUM_VARIABLES,MIN,MAX)
-      nectar_spots[i] = 5
-  return (employeds, nectar_spots)
-
 def find_best(employeds, best_solution, interacoes):
   best_value = obj_fun(best_solution)
   switch = False
