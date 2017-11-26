@@ -50,6 +50,7 @@ void player_player();
 void comp_player();
 void comp_comp();
 void minimax_alphabeta();
+void run_test();
 
 // Variaives do Jogo
 int tabuleiro[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
@@ -70,7 +71,7 @@ int main(int argc, char const *argv[]){
     }
     mode = atoi(argv[1]);
     alg = atoi(argv[2]);
-    if(mode < 0 || mode > 4 || alg < 0 || alg > 1){
+    if(mode < 0 || mode > 5 || alg < 0 || alg > 1){
         std::cout << "Tem paremetro errado ai parça\n\n Tenta assim:\n\n./hocus_pocus [MODE] [ALG]\n-> [MODE]\n\n(0) Player   x Player\n(1) Player   x Computer (Player   First)\n(2) Computer x Player   (Computer First)\n(3) Computer x Computer\n(4) Comp(MiniMax) x Comp(AlphaBeta)\n\n-> [ALG]: Algorithm\n\n(0) MiniMax\n(1) Alpha-Beta\n" << std::endl;
         return 0;
     }
@@ -92,9 +93,33 @@ int main(int argc, char const *argv[]){
         case 4:
             minimax_alphabeta();
             break;
+        case 5:
+            run_test();
+            break;
     }
     return 0;
 }
+
+void run_test(){
+    int tabular_test[9][3][3]= {{{1,0,0},{0,0,0},{0,0,0}},
+                            {{0,1,0},{0,0,0},{0,0,0}},
+                            {{0,0,1},{0,0,0},{0,0,0}},
+                            {{0,0,0},{1,0,0},{0,0,0}},
+                            {{0,0,0},{0,1,0},{0,0,0}},
+                            {{0,0,0},{0,0,1},{0,0,0}},
+                            {{0,0,0},{0,0,0},{1,0,0}},
+                            {{0,0,0},{0,0,0},{0,1,0}},
+                            {{0,0,0},{0,0,0},{0,0,1}}};
+
+    for(int i=0;i<9;i++){
+        minimax(-1,1,false,tabular_test[i]);
+    }
+    std::cout << std::endl;
+    for(int i=0;i<9;i++){
+        poda_alpha_beta(-1,1,false,tabular_test[i],-100000,100000);
+    }
+}
+
 
 void player_player(){
     while(run){
