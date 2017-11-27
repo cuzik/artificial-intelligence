@@ -7,7 +7,7 @@ MIN = 0
 NUM_BEES = 10
 files_test = [6,20,100,250]
 atual_file = 1
-loops = 50000
+loops = 5000
 
 
 def read_file(input):
@@ -177,8 +177,8 @@ def main():
   best_solution = new_spot(files_test[atual_file],MIN,MAX)
 
   #Inicialize a população;
-  employeds = population_init(files_test[atual_file],int(NUM_BEES/2));
-  nectar_spots = [6 for i in range(0,len(employeds))]
+  employeds = population_init(files_test[atual_file],int(NUM_BEES));
+  nectar_spots = [40 for i in range(0,len(employeds))]
   for i in range(0,loops):
     #Posicione as abelhas campeiras em suas fontes de alimento;
     (employeds, nectar_spots) = dance(employeds, nectar_spots)
