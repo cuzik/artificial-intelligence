@@ -50,20 +50,28 @@ def sat():
   data_ori = read_file(files_test[3])
   values   = hash_bin(files_test[3])
   mirror = mirror_bin(data_ori,values)
-  print fitness(mirror)
+  for i in range(0,500000):
+    print fitness(mirror)
 
-def random_search():
-  data_ori = read_file(files_test[1])
+def random_search(test_case):
+  data_ori = read_file(files_test[test_case])
   fit_max = 0
   best = {}
-  for i in range(0,5000):
-    values   = hash_bin(files_test[1])
+  for i in range(0,500000):
+    values   = hash_bin(files_test[test_case])
     mirror = mirror_bin(data_ori,values)
     fit = fitness(mirror)
     if fit_max < fit:
       best = values
       fit_max = fit
-  print best
-  print fit_max
+  # print best
+  return fit_max
 
-random_search()
+def main():
+  for i in range(1,4):
+    print 'case test ' + str(i)
+    for j in range(0,10):
+      print random_search(i)
+
+if __name__ == '__main__':
+  main()

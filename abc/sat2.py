@@ -7,7 +7,7 @@ MIN = 0
 NUM_BEES = 10
 files_test = [6,20,100,250]
 atual_file = 1
-loops = 5000
+loops = 10000
 
 
 def read_file(input):
